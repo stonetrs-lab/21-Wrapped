@@ -1,604 +1,1447 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>21 Wrapped · zhaojyne</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=Unbounded:wght@500;800&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --display: 'Unbounded', 'Arial Black', system-ui, sans-serif;
-    --body: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
-    --bg: #1d0f3a; --fg: #f6f0ff; --accent: #ff5fa2;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; overflow: hidden; background: var(--bg); }
-  body { font-family: var(--body); color: var(--fg); -webkit-font-smoothing: antialiased; }
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>21 Wrapped · zhaojyne</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=Unbounded:wght@500;800&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            :root {
+                --display: "Unbounded", "Arial Black", system-ui, sans-serif;
+                --body:
+                    "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+                --bg: #1d0f3a;
+                --fg: #f6f0ff;
+                --accent: #ff5fa2;
+            }
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            html,
+            body {
+                height: 100%;
+                overflow: hidden;
+                background: var(--bg);
+            }
+            body {
+                font-family: var(--body);
+                color: var(--fg);
+                -webkit-font-smoothing: antialiased;
+            }
 
-  #stage { position: fixed; inset: 0; background: var(--bg); transition: background .4s; user-select: none; }
-  #bars { position: absolute; z-index: 3; top: 14px; left: 16px; right: 16px; display: flex; gap: 4px; }
-  #bars button { flex: 1; height: 4px; border: 0; border-radius: 2px; cursor: pointer;
-    background: color-mix(in srgb, var(--fg) 25%, transparent); }
-  #bars button.past, #bars button.now { background: var(--fg); }
+            #stage {
+                position: fixed;
+                inset: 0;
+                background: var(--bg);
+                transition: background 0.4s;
+                user-select: none;
+            }
+            #bars {
+                position: absolute;
+                z-index: 3;
+                top: 14px;
+                left: 16px;
+                right: 16px;
+                display: flex;
+                gap: 4px;
+            }
+            #bars button {
+                flex: 1;
+                height: 4px;
+                border: 0;
+                border-radius: 2px;
+                cursor: pointer;
+                background: color-mix(in srgb, var(--fg) 25%, transparent);
+            }
+            #bars button.past,
+            #bars button.now {
+                background: var(--fg);
+            }
 
-  .slide { position: absolute; inset: 0; display: none; overflow-y: auto;
-    padding: 56px 16px 72px; background: var(--bg); color: var(--fg); }
-  .slide.on { display: flex; }
-  .inner { margin: auto; width: 100%; max-width: 680px; display: flex; flex-direction: column; gap: 18px; }
+            .slide {
+                position: absolute;
+                inset: 0;
+                display: none;
+                overflow-y: auto;
+                padding: 56px 16px 72px;
+                background: var(--bg);
+                color: var(--fg);
+            }
+            .slide.on {
+                display: flex;
+            }
+            .inner {
+                margin: auto;
+                width: 100%;
+                max-width: 680px;
+                display: flex;
+                flex-direction: column;
+                gap: 18px;
+            }
 
-  .kicker { font-weight: 800; font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
-    color: color-mix(in srgb, var(--fg) 72%, var(--bg)); }
-  .huge { font-family: var(--display); font-weight: 800; line-height: .9; letter-spacing: -.03em;
-    font-size: clamp(88px, 24vw, 200px); font-variant-numeric: tabular-nums; }
-  .big { font-family: var(--display); font-weight: 800; line-height: 1.02; letter-spacing: -.02em;
-    font-size: clamp(32px, 7.5vw, 64px); overflow-wrap: anywhere; }
-  .mid { font-family: var(--display); font-weight: 500; font-size: clamp(22px, 4.6vw, 34px); line-height: 1.1; }
-  .lede { font-size: clamp(18px, 2.6vw, 22px); line-height: 1.4; font-weight: 600; max-width: 34em; }
-  .note { font-size: 13px; color: color-mix(in srgb, var(--fg) 62%, var(--bg)); }
-  .accent { color: var(--accent); }
-  .hint { font-size: 14px; font-weight: 600; color: color-mix(in srgb, var(--fg) 62%, var(--bg)); margin-top: 12px; }
-  .unit { font-size: .45em; letter-spacing: 0; }
+            .kicker {
+                font-weight: 800;
+                font-size: 13px;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                color: color-mix(in srgb, var(--fg) 72%, var(--bg));
+            }
+            .huge {
+                font-family: var(--display);
+                font-weight: 800;
+                line-height: 0.9;
+                letter-spacing: -0.03em;
+                font-size: clamp(88px, 24vw, 200px);
+                font-variant-numeric: tabular-nums;
+            }
+            .big {
+                font-family: var(--display);
+                font-weight: 800;
+                line-height: 1.02;
+                letter-spacing: -0.02em;
+                font-size: clamp(32px, 7.5vw, 64px);
+                overflow-wrap: anywhere;
+            }
+            .mid {
+                font-family: var(--display);
+                font-weight: 500;
+                font-size: clamp(22px, 4.6vw, 34px);
+                line-height: 1.1;
+            }
+            .lede {
+                font-size: clamp(18px, 2.6vw, 22px);
+                line-height: 1.4;
+                font-weight: 600;
+                max-width: 34em;
+            }
+            .note {
+                font-size: 13px;
+                color: color-mix(in srgb, var(--fg) 62%, var(--bg));
+            }
+            .accent {
+                color: var(--accent);
+            }
+            .hint {
+                font-size: 14px;
+                font-weight: 600;
+                color: color-mix(in srgb, var(--fg) 62%, var(--bg));
+                margin-top: 12px;
+            }
+            .unit {
+                font-size: 0.45em;
+                letter-spacing: 0;
+            }
 
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .chip { padding: 7px 14px; border-radius: 999px; font-weight: 700; font-size: 15px;
-    border: 2px solid color-mix(in srgb, var(--fg) 30%, transparent); }
-  .chip.solid { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+            .chips {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .chip {
+                padding: 7px 14px;
+                border-radius: 999px;
+                font-weight: 700;
+                font-size: 15px;
+                border: 2px solid color-mix(in srgb, var(--fg) 30%, transparent);
+            }
+            .chip.solid {
+                background: var(--fg);
+                color: var(--bg);
+                border-color: var(--fg);
+            }
 
-  .facts { display: grid; gap: 14px; }
-  .fact { padding: 16px 18px; border-radius: 16px; background: color-mix(in srgb, var(--fg) 9%, transparent); }
-  .fact .mid { margin: 4px 0; }
+            .facts {
+                display: grid;
+                gap: 14px;
+            }
+            .fact {
+                padding: 16px 18px;
+                border-radius: 16px;
+                background: color-mix(in srgb, var(--fg) 9%, transparent);
+            }
+            .fact .mid {
+                margin: 4px 0;
+            }
 
-  /* charts: one muted series, the highlight in --accent, text in fg tokens */
-  .chart { margin-top: 6px; }
-  .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
-  .base { stroke: color-mix(in srgb, var(--fg) 30%, transparent); stroke-width: 1; }
-  .bar { fill: color-mix(in srgb, var(--fg) 42%, transparent); transform-box: fill-box; transform-origin: bottom; }
-  .bar.hi { fill: var(--accent); }
-  .col:hover .bar { fill: var(--fg); }
-  .col:hover .bar.hi { fill: var(--accent); filter: brightness(1.15); }
-  .stub { fill: color-mix(in srgb, var(--fg) 20%, transparent); }
-  .hit { fill: transparent; cursor: crosshair; }
-  .axis { position: relative; height: 20px; margin-top: 8px; font-size: 12px; font-weight: 600;
-    color: color-mix(in srgb, var(--fg) 62%, var(--bg)); }
-  .axis span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
-  .axis span:first-child { transform: none; }
-  .axis span:last-child { transform: translateX(-100%); }
+            /* charts: one muted series, the highlight in --accent, text in fg tokens */
+            .chart {
+                margin-top: 6px;
+            }
+            .chart svg {
+                display: block;
+                width: 100%;
+                height: auto;
+                overflow: visible;
+            }
+            .base {
+                stroke: color-mix(in srgb, var(--fg) 30%, transparent);
+                stroke-width: 1;
+            }
+            .bar {
+                fill: color-mix(in srgb, var(--fg) 42%, transparent);
+                transform-box: fill-box;
+                transform-origin: bottom;
+            }
+            .bar.hi {
+                fill: var(--accent);
+            }
+            .col:hover .bar {
+                fill: var(--fg);
+            }
+            .col:hover .bar.hi {
+                fill: var(--accent);
+                filter: brightness(1.15);
+            }
+            .stub {
+                fill: color-mix(in srgb, var(--fg) 20%, transparent);
+            }
+            .hit {
+                fill: transparent;
+                cursor: crosshair;
+            }
+            .axis {
+                position: relative;
+                height: 20px;
+                margin-top: 8px;
+                font-size: 12px;
+                font-weight: 600;
+                color: color-mix(in srgb, var(--fg) 62%, var(--bg));
+            }
+            .axis span {
+                position: absolute;
+                transform: translateX(-50%);
+                white-space: nowrap;
+            }
+            .axis span:first-child {
+                transform: none;
+            }
+            .axis span:last-child {
+                transform: translateX(-100%);
+            }
 
-  .area { fill: color-mix(in srgb, var(--accent) 22%, transparent); }
-  .line { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
-  .typical { stroke: color-mix(in srgb, var(--fg) 55%, transparent); stroke-width: 1; stroke-dasharray: 4 5; }
-  .peak, .cursor { fill: var(--accent); stroke: var(--bg); stroke-width: 2; }
-  .cross { stroke: color-mix(in srgb, var(--fg) 50%, transparent); stroke-width: 1; }
-  .cursor, .cross { opacity: 0; }
-  .line-chart:hover .cursor, .line-chart:hover .cross { opacity: 1; }
-  .overlay { fill: transparent; cursor: crosshair; }
+            .area {
+                fill: color-mix(in srgb, var(--accent) 22%, transparent);
+            }
+            .line {
+                fill: none;
+                stroke: var(--accent);
+                stroke-width: 2;
+                stroke-linejoin: round;
+                stroke-linecap: round;
+            }
+            .typical {
+                stroke: color-mix(in srgb, var(--fg) 55%, transparent);
+                stroke-width: 1;
+                stroke-dasharray: 4 5;
+            }
+            .peak,
+            .cursor {
+                fill: var(--accent);
+                stroke: var(--bg);
+                stroke-width: 2;
+            }
+            .cross {
+                stroke: color-mix(in srgb, var(--fg) 50%, transparent);
+                stroke-width: 1;
+            }
+            .cursor,
+            .cross {
+                opacity: 0;
+            }
+            .line-chart:hover .cursor,
+            .line-chart:hover .cross {
+                opacity: 1;
+            }
+            .overlay {
+                fill: transparent;
+                cursor: crosshair;
+            }
 
-  .hrows { display: grid; gap: 12px; }
-  .hrow { display: grid; grid-template-columns: minmax(90px, 34%) 1fr auto; align-items: center; gap: 12px; font-weight: 700; }
-  .hlabel { font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .htrack { height: 14px; }
-  .hbar { height: 100%; width: var(--w); border-radius: 0 4px 4px 0;
-    background: color-mix(in srgb, var(--fg) 42%, transparent); }
-  .hrow:first-child .hbar, .hbar.hi { background: var(--accent); }
-  .hval { font-variant-numeric: tabular-nums; font-size: 15px; min-width: 3ch; text-align: right; }
+            .hrows {
+                display: grid;
+                gap: 12px;
+            }
+            .hrow {
+                display: grid;
+                grid-template-columns: minmax(90px, 34%) 1fr auto;
+                align-items: center;
+                gap: 12px;
+                font-weight: 700;
+            }
+            .hlabel {
+                font-size: 15px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .htrack {
+                height: 14px;
+            }
+            .hbar {
+                height: 100%;
+                width: var(--w);
+                border-radius: 0 4px 4px 0;
+                background: color-mix(in srgb, var(--fg) 42%, transparent);
+            }
+            .hrow:first-child .hbar,
+            .hbar.hi {
+                background: var(--accent);
+            }
+            .hval {
+                font-variant-numeric: tabular-nums;
+                font-size: 15px;
+                min-width: 3ch;
+                text-align: right;
+            }
 
-  .dots { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; }
-  .dcol { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: default; }
-  .dstack { display: flex; flex-direction: column-reverse; gap: 4px; }
-  .dstack i { display: block; width: 14px; height: 14px; border-radius: 50%;
-    background: color-mix(in srgb, var(--fg) 45%, transparent); }
-  .dcol.hi i { background: var(--accent); }
-  .dcol span { font-size: 12px; font-weight: 700; color: color-mix(in srgb, var(--fg) 70%, var(--bg)); }
+            .dots {
+                display: flex;
+                align-items: flex-end;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+            .dcol {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 6px;
+                cursor: default;
+            }
+            .dstack {
+                display: flex;
+                flex-direction: column-reverse;
+                gap: 4px;
+            }
+            .dstack i {
+                display: block;
+                width: 14px;
+                height: 14px;
+                border-radius: 50%;
+                background: color-mix(in srgb, var(--fg) 45%, transparent);
+            }
+            .dcol.hi i {
+                background: var(--accent);
+            }
+            .dcol span {
+                font-size: 12px;
+                font-weight: 700;
+                color: color-mix(in srgb, var(--fg) 70%, var(--bg));
+            }
 
-  .grid { display: grid; gap: 7px; }
-  .branch { display: grid; grid-template-columns: minmax(80px, 30%) 1fr; gap: 12px; align-items: center; }
-  .branch b { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .cells { display: flex; flex-wrap: wrap; gap: 3px; }
-  .cells i { width: 16px; height: 16px; border-radius: 3px;
-    border: 2px solid color-mix(in srgb, var(--fg) 28%, transparent); }
-  .cells i.on { background: var(--accent); border-color: var(--accent); }
-  .branch.clear b { color: var(--accent); }
+            .grid {
+                display: grid;
+                gap: 7px;
+            }
+            .branch {
+                display: grid;
+                grid-template-columns: minmax(110px, 40%) 1fr;
+                gap: 12px;
+                align-items: center;
+            }
+            .branch b {
+                font-size: 13px;
+                display: flex;
+                gap: 6px;
+                min-width: 0;
+            }
+            .branch b span {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .branch b small {
+                flex: none;
+            }
+            .cells {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 3px;
+            }
+            .cells i {
+                width: 16px;
+                height: 16px;
+                border-radius: 3px;
+                border: 2px solid color-mix(in srgb, var(--fg) 28%, transparent);
+            }
+            .cells i {
+                cursor: default;
+            }
+            .cells i.on {
+                background: var(--accent);
+                border-color: var(--accent);
+            }
+            .cells i.wip {
+                border-color: var(--accent);
+            }
+            .branch b small {
+                font-weight: 600;
+                color: color-mix(in srgb, var(--fg) 62%, var(--bg));
+            }
+            .branch.clear b {
+                color: var(--accent);
+            }
 
-  .people { display: grid; gap: 10px 20px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
-  .person { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; min-width: 0; }
-  .avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex: none;
-    font-family: var(--display); font-size: 13px; background: var(--fg); color: var(--bg); }
-  .person:first-child .avatar { background: var(--accent); }
-  .person small { margin-left: auto; font-size: 14px; color: color-mix(in srgb, var(--fg) 70%, var(--bg)); }
+            .people {
+                display: grid;
+                gap: 10px 20px;
+                grid-template-columns: repeat(
+                    auto-fill,
+                    minmax(min(100%, 230px), 1fr)
+                );
+            }
+            .person {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-weight: 700;
+                font-size: 16px;
+                min-width: 0;
+            }
+            .avatar {
+                width: 34px;
+                height: 34px;
+                border-radius: 50%;
+                display: grid;
+                place-items: center;
+                flex: none;
+                font-family: var(--display);
+                font-size: 13px;
+                background: var(--fg);
+                color: var(--bg);
+            }
+            .person:first-child .avatar {
+                background: var(--accent);
+            }
+            .person small {
+                margin-left: auto;
+                font-size: 14px;
+                color: color-mix(in srgb, var(--fg) 70%, var(--bg));
+            }
 
-  .courses { display: grid; gap: 10px; }
-  .course { padding: 12px 16px; border-radius: 14px; background: color-mix(in srgb, var(--fg) 9%, transparent); }
-  .course-top { display: flex; justify-content: space-between; gap: 12px; font-weight: 800; }
-  .pill { font-size: 12px; padding: 3px 10px; border-radius: 999px; white-space: nowrap;
-    border: 1.5px solid color-mix(in srgb, var(--fg) 40%, transparent); }
-  .pill.ok { background: var(--accent); border-color: var(--accent); color: var(--bg); }
-  .course p { font-size: 13px; margin-top: 4px; color: color-mix(in srgb, var(--fg) 68%, var(--bg)); }
+            .courses {
+                display: grid;
+                gap: 10px;
+            }
+            .course {
+                padding: 12px 16px;
+                border-radius: 14px;
+                background: color-mix(in srgb, var(--fg) 9%, transparent);
+            }
+            .course-top {
+                display: flex;
+                justify-content: space-between;
+                gap: 12px;
+                font-weight: 800;
+            }
+            .pill {
+                font-size: 12px;
+                padding: 3px 10px;
+                border-radius: 999px;
+                white-space: nowrap;
+                border: 1.5px solid
+                    color-mix(in srgb, var(--fg) 40%, transparent);
+            }
+            .pill.ok {
+                background: var(--accent);
+                border-color: var(--accent);
+                color: var(--bg);
+            }
+            .course p {
+                font-size: 13px;
+                margin-top: 4px;
+                color: color-mix(in srgb, var(--fg) 68%, var(--bg));
+            }
 
-  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
-  .tile { padding: 16px; border-radius: 16px; background: color-mix(in srgb, var(--fg) 10%, transparent); }
-  .tile .mid { font-weight: 800; }
-  .badges { display: flex; flex-wrap: wrap; gap: 10px; }
-  .badge { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; overflow: hidden;
-    background: color-mix(in srgb, var(--fg) 12%, transparent); font-family: var(--display); font-size: 18px; }
-  .badge img { width: 100%; height: 100%; object-fit: contain; }
+            .tiles {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 12px;
+            }
+            .tile {
+                padding: 16px;
+                border-radius: 16px;
+                background: color-mix(in srgb, var(--fg) 10%, transparent);
+            }
+            .tile .mid {
+                font-weight: 800;
+            }
+            .badges {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .badge {
+                width: 52px;
+                height: 52px;
+                border-radius: 14px;
+                display: grid;
+                place-items: center;
+                overflow: hidden;
+                background: color-mix(in srgb, var(--fg) 12%, transparent);
+                font-family: var(--display);
+                font-size: 18px;
+            }
+            .badge img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
 
-  .card { border-radius: 28px; padding: 28px 24px; display: grid; gap: 22px;
-    background: var(--fg); color: var(--bg); box-shadow: 0 30px 80px -30px rgba(0,0,0,.5); }
-  .card .kicker { color: color-mix(in srgb, var(--bg) 70%, var(--fg)); }
-  .card .big { color: var(--accent); }
-  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 16px; }
-  .card-grid div { min-width: 0; }
-  .card-grid span { display: block; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
-    color: color-mix(in srgb, var(--bg) 62%, var(--fg)); }
-  .card-grid b { display: block; font-family: var(--display); font-size: clamp(17px, 3.6vw, 24px); font-weight: 800;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .card-foot { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; gap: 12px;
-    color: color-mix(in srgb, var(--bg) 62%, var(--fg)); }
+            .card {
+                border-radius: 28px;
+                padding: 28px 24px;
+                display: grid;
+                gap: 22px;
+                background: var(--fg);
+                color: var(--bg);
+                box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.5);
+            }
+            .card .kicker {
+                color: color-mix(in srgb, var(--bg) 70%, var(--fg));
+            }
+            .card .big {
+                color: var(--accent);
+            }
+            .card-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 18px 16px;
+            }
+            .card-grid div {
+                min-width: 0;
+            }
+            .card-grid span {
+                display: block;
+                font-size: 12px;
+                font-weight: 800;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                color: color-mix(in srgb, var(--bg) 62%, var(--fg));
+            }
+            .card-grid b {
+                display: block;
+                font-family: var(--display);
+                font-size: clamp(17px, 3.6vw, 24px);
+                font-weight: 800;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .card-foot {
+                display: flex;
+                justify-content: space-between;
+                font-size: 13px;
+                font-weight: 700;
+                gap: 12px;
+                color: color-mix(in srgb, var(--bg) 62%, var(--fg));
+            }
 
-  #nav { position: absolute; z-index: 3; right: 16px; bottom: 16px; display: flex; gap: 8px; }
-  #nav button { width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer; font-size: 20px; font-weight: 800;
-    background: color-mix(in srgb, var(--fg) 14%, transparent); color: var(--fg); }
-  #nav button:focus-visible, #bars button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+            #nav {
+                position: absolute;
+                z-index: 3;
+                right: 16px;
+                bottom: 16px;
+                display: flex;
+                gap: 8px;
+            }
+            #nav button {
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                border: 0;
+                cursor: pointer;
+                font-size: 20px;
+                font-weight: 800;
+                background: color-mix(in srgb, var(--fg) 14%, transparent);
+                color: var(--fg);
+            }
+            #nav button:focus-visible,
+            #bars button:focus-visible {
+                outline: 3px solid var(--accent);
+                outline-offset: 2px;
+            }
 
-  #tip { position: fixed; z-index: 5; pointer-events: none; padding: 7px 11px; border-radius: 10px;
-    background: var(--fg); color: var(--bg); font-size: 13px; font-weight: 700; white-space: nowrap;
-    opacity: 0; transform: translate(-50%, calc(-100% - 12px)); transition: opacity .12s; }
-  #tip.show { opacity: 1; }
+            #tip {
+                position: fixed;
+                z-index: 5;
+                pointer-events: none;
+                padding: 7px 11px;
+                border-radius: 10px;
+                background: var(--fg);
+                color: var(--bg);
+                font-size: 13px;
+                font-weight: 700;
+                white-space: nowrap;
+                opacity: 0;
+                transform: translate(-50%, calc(-100% - 12px));
+                transition: opacity 0.12s;
+            }
+            #tip.show {
+                opacity: 1;
+            }
 
-  .slide.on .rise { animation: rise .65s cubic-bezier(.2,.75,.2,1) both; animation-delay: calc(var(--i, 0) * 110ms); }
-  .slide.on .bar { animation: grow .7s cubic-bezier(.2,.75,.2,1) both; animation-delay: calc(300ms + var(--d, 0ms)); }
-  .slide.on .hbar { animation: widen .9s cubic-bezier(.2,.75,.2,1) both .35s; }
-  .slide.on .line { stroke-dasharray: 1; animation: draw 1.4s ease-out both .3s; }
-  .slide.on .cells i.on { animation: pop .35s both; animation-delay: calc(400ms + var(--d, 0ms)); }
-  @keyframes rise { from { opacity: 0; transform: translateY(26px); } }
-  @keyframes grow { from { transform: scaleY(0); } }
-  @keyframes widen { from { width: 0; } }
-  @keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
-  @keyframes pop { from { transform: scale(0); } }
-  @media (prefers-reduced-motion: reduce) {
-    .slide.on .rise, .slide.on .bar, .slide.on .hbar, .slide.on .line, .slide.on .cells i.on { animation: none; }
-    #stage { transition: none; }
-  }
-  @media (min-width: 720px) { .slide { padding: 72px 48px 80px; } .inner { gap: 22px; } }
-</style>
-</head>
-<body>
-<div id="stage">
-  <div id="bars" aria-label="Slides"></div>
-  <main id="slides"></main>
-  <div id="nav">
-    <button id="prev" aria-label="Previous slide">‹</button>
-    <button id="next" aria-label="Next slide">›</button>
-  </div>
-</div>
-<div id="tip" role="tooltip"></div>
-<script id="story" type="application/json">{"login": "zhaojyne", "participant": {"login": "zhaojyne", "className": "25_08_MSK", "parallelName": "Core program", "expValue": 7923, "level": 9, "expToNextLevel": 1776, "campus": {"id": "6bfe3c56-0211-4fe1-9e59-51616caac4dd", "shortName": "21 Moscow"}, "status": "ACTIVE"}, "fetchedAt": "2026-10-13T18:53:10.340998", "projects": {"done": 25, "failed": 0, "active": 14, "byType": {"INDIVIDUAL": 19, "GROUP": 5, "EXAM_TEST": 1}, "activeTitles": ["DO5_SimpleDocker", "AP1-Go-T01", "C7_BrickGame_v1.0", "AP1-JS-T01", "AP1-Py-T03", "A1_Maze_C", "PjM1_ProjPM", "BSA00_Decomposition", "PG1_Pangolin", "CbS1_Networking_basics_Part 1", "QA1_Foundation", "UX/UI1_Intro", "PM1_PMStarterPack", "Core_Strategy"], "failedTitles": []}, "grades": {"average": 103, "best": {"title": "DO2_Linux Network", "score": 140}, "closest": {"title": "SQL_Ex-t", "score": 63}, "over100": 4, "exactly100": 18, "max": 140, "scores": [63, 95, 95, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120, 126, 136, 140]}, "timeline": {"first": {"title": "C2_SimpleBashUtils", "date": "2025-10-19"}, "latest": {"title": "AP1-Py-P01", "date": "2026-09-30"}, "months": [{"month": "2025-10", "count": 1}, {"month": "2025-11", "count": 1}, {"month": "2025-12", "count": 0}, {"month": "2026-01", "count": 1}, {"month": "2026-02", "count": 3}, {"month": "2026-03", "count": 4}, {"month": "2026-04", "count": 3}, {"month": "2026-05", "count": 3}, {"month": "2026-06", "count": 2}, {"month": "2026-07", "count": 1}, {"month": "2026-08", "count": 4}, {"month": "2026-09", "count": 2}], "peakMonth": {"month": "2026-03", "count": 4}, "drought": {"days": 68, "from": "2025-11-06", "brokenBy": "C5_s21_decimal"}, "rushWeek": {"count": 6, "from": "2026-04-26"}}, "clock": {"hours": [1, 0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 1, 2, 1, 0, 2, 1, 2, 3, 1, 1, 1, 2, 4], "weekdays": [{"day": "Mon", "count": 2}, {"day": "Tue", "count": 3}, {"day": "Wed", "count": 5}, {"day": "Thu", "count": 3}, {"day": "Fri", "count": 2}, {"day": "Sat", "count": 5}, {"day": "Sun", "count": 5}], "peakHour": 23, "persona": "night"}, "squad": {"groupProjects": 5, "teamlead": 0, "uniqueMates": 7, "mates": [{"login": "mixedwhi", "count": 2}, {"login": "basiliaq", "count": 2}, {"login": "titanlig", "count": 1}, {"login": "jorgenzi", "count": 1}, {"login": "jolineil", "count": 1}, {"login": "hermilbr", "count": 1}, {"login": "stonetrs", "count": 1}]}, "courses": {"done": 3, "total": 48, "list": [{"title": "SQL1", "status": "ACCEPTED", "percent": 100, "projectsDone": 12, "projectsSeen": 12, "projects": ["SQLB2_Retrieving data", "SQLB3_Retrieving data deep dive", "SQLB4_DML", "SQLB5_Snapshots", "SQLB7_Database index ", "SQLB8_Integrating features", "SQLB9_OLAP", "SQLB10_Isolation levels", "SQLB11_Functions and procs", "SQLB12_Warehouse fundamentals", "SQLB1_Basics", "SQLB6_Salesman problem"]}, {"title": "CT_Part1", "status": "ACCEPTED", "percent": 100, "projectsDone": 2, "projectsSeen": 2, "projects": ["CT1_Self-determination", "CT2_Dream job"]}, {"title": "SQL_Ex", "status": "ACCEPTED", "percent": 63, "projectsDone": 1, "projectsSeen": 1, "projects": ["SQL_Ex-t"]}, {"title": "APP1_Bootcamp", "status": "IN_PROGRESS", "percent": null, "projectsDone": 3, "projectsSeen": 4, "projects": ["AP1-Py-T01", "AP1-Py-T02", "AP1-Py-P01", "AP1-Py-T03"]}, {"title": "CT_Part2", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 6, "projects": ["CT3_CV Resume", "CT4_Interview", "CT5_Teamwork", "CT6_Corporate culture", "CT7_Corporate Communication", "CT8_Career planning"]}, {"title": "Frontend Bootcamp", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 14, "projects": ["FEB1_JS", "FEB2_Native JS", "FEB3_HTML and CSS", "FEB4_Advanced Web", "FEB5_Express framework", "FEB6_HTML templating", "FEB7_SeaBattle game", "FEB8_React", "FEB9_Memoization", "FEB10_Data storages", "FEB11_Routing", "FEB12_React Redux", "FEB13_TypeScript", "FEB14_Web Building"]}, {"title": "APJ1_Backend", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-Jv-T04B", "AP1-Jv-T05B"]}, {"title": "APP1", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 12, "projects": ["APP1 Bootcamp. Day00", "APP1 Bootcamp. Day01", "APP1 Bootcamp. Day03", "APP1 Bootcamp. Day02", "APP1 Bootcamp. Day04", "APP1 Bootcamp. Team00", "APP1 Bootcamp. Day05", "APP1 Bootcamp. Day06", "APP1 Bootcamp. Day07", "APP1 Bootcamp. Day08", "APP1 Bootcamp. Team01", "APP1 Bootcamp. Day09"]}, {"title": "APP1_Backend", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-Py-T04B", "AP1-Py-T05B"]}, {"title": "APK1_Mobile", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-Kt-T04M", "AP1-Kt-T05M"]}, {"title": "APJ1_Mobile", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-Jv-T04M", "AP1-Jv-T05M"]}, {"title": "CPP_Ex", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["CPP_Ex-p", "CPP_Ex-t"]}, {"title": "Swift Bootcamp", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 12, "projects": ["Swift Bootcamp. Day00", "Swift Bootcamp. Day01", "Swift Bootcamp. Day02", "Swift Bootcamp. Day03", "Swift Bootcamp. Day04", "Swift Bootcamp. Team00", "Swift Bootcamp. Day05", "Swift Bootcamp. Day06", "Swift Bootcamp. Day07", "Swift Bootcamp. Day08", "Swift Bootcamp. Day09", "Swift Bootcamp. Team01"]}, {"title": "Electrical Engineering Bootcamp", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 13, "projects": ["EEB1_Basics", "EEB2_AC circuit analysis", "EEB3_Circuit calc", "EEB4_Connection circuits", "EEB5_Operational amplifiers", "EEB6_Filters", "EEB7_Speed control", "EEB8_Arduino boards", "EEB9_Module integration", "EEB10_STM fundamentals", "EEB11_STM code", "EEB12_Transferring data", "EEB13_Satellite odometer"]}, {"title": "C_Ex", "status": "REGISTERED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["C_Ex-t", "C_Ex-p"]}, {"title": "APK1_Backend", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-Kt-T04B", "AP1-Kt-T05B"]}, {"title": "APS1_Mobile", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-Sw-T04M", "AP1-Sw-T05M"]}, {"title": "APG1", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 12, "projects": ["APG1 Bootcamp. Day00", "APG1 Bootcamp.  Day01", "APG1 Bootcamp. Day02", "APG1 Bootcamp. Day03", "APG1 Bootcamp. Day04", "APG1 Bootcamp.  Day05", "APG1 Bootcamp.  Day06", "APG1 Bootcamp. Day07", "APG1 Bootcamp. Day08", "APG1 Bootcamp. Day09", "APG1 Bootcamp. Team00", "APG1 Bootcamp. Team01"]}, {"title": "CPPE", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["CPP Exam", "CPPE-T"]}, {"title": "Data Science Bootcamp", "status": "REGISTERED", "percent": null, "projectsDone": 0, "projectsSeen": 12, "projects": ["DSB1_UNIX Command Line Tools_", "DSB2_Syntax&Semantics_", "DSB3_OOP skills_", "DSB4_Package management_", "DSB5_Efficient code practices_", "DSB6_MovieLens Analytics_", "DSB7_Pandas_", "DSB8_SQL&Pandas_", "DSB9_Pandas_SQL& Data Visual_", "DSB10_Intro to ML_", "DSB11_ML: Advanced_", "DSB12_Food&nutrition_"]}, {"title": "APS1_Bootcamp", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 4, "projects": ["AP1-Sw-T01", "AP1-Sw-T02", "AP1-Sw-P01", "AP1-Sw-T03"]}, {"title": "APJS_Ex", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 1, "projects": ["APJS_Ex-t"]}, {"title": "APC1", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 11, "projects": ["APC1 Bootcamp. Day00", "APC1 Bootcamp. Day01", "APC1 Bootcamp. Day02", "APC1 Bootcamp. Day03", "APC1 Bootcamp. Day04", "APC1 Bootcamp. Day05", "APC1 Bootcamp. Day06", "APC1 Bootcamp. Day07", "APC1 Bootcamp. Day08", "APC1 Bootcamp. Team01", "APC1 Bootcamp. Team00"]}, {"title": "APS1_Backend", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-Sw-T04B", "AP1-Sw-T05B"]}, {"title": "ROS Bootcamp", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 12, "projects": ["ROSB1_Intro", "ROSB2_Advanced node", "ROSB3_TF library ", "ROSB4_Robot simulation", "ROSB5_Robot sensor ", "ROSB7_Robot mapping", "ROSB8_Robot navigation", "ROSB9_MoveIt arm control", "ROSB10_Computer vision ", "ROSB11_Robot behaviors ", "ROSB6_Robot programming", "ROSB12_Robotics Pro"]}, {"title": "Core final exam", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["Core final testing", "Core final exam"]}, {"title": "Kotlin Bootcamp", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 12, "projects": ["Kotlin Bootcamp. Day00", "Kotlin Bootcamp. Day01", "Kotlin Bootcamp. Day02", "Kotlin Bootcamp. Day03", "Kotlin Bootcamp. Day04", "Kotlin Bootcamp. Team00", "Kotlin Bootcamp. Day05", "Kotlin Bootcamp. Day06", "Kotlin Bootcamp. Day07", "Kotlin Bootcamp. Day08", "Kotlin Bootcamp. Day09", "Kotlin Bootcamp. Team01"]}, {"title": "DB Bootcamp", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 12, "projects": ["DB Bootcamp. Day00", "DB Bootcamp. Day01", "DB Bootcamp. Day02", "DB Bootcamp. Day03", "DB Bootcamp. Day04", "DB Bootcamp. Day05", "DB Bootcamp. Day06", "DB Bootcamp. Day07", "DB Bootcamp. Day08", "DB Bootcamp. Day09", "DB Bootcamp. Team00", "DB Bootcamp. Team01"]}, {"title": "APCS1_Backend", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-CS-T04B", "AP1-CS-T05B"]}, {"title": "APJS1_Backend", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-JS-T04B", "AP1-JS-T05B"]}, {"title": "APJS1_Frontend", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-JS-T04F", "AP1-JS-T05F"]}, {"title": "APK_Ex", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 1, "projects": ["APK_Ex-t"]}, {"title": "APJ1", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 12, "projects": ["Java Bootcamp. Day00", "Java Bootcamp. Day01", "Java Bootcamp. Day02", "Java Bootcamp. Day03", "Java Bootcamp. Day04", "Java Bootcamp. Team00", "Java Bootcamp. Day05", "Java Bootcamp. Day06", "Java Bootcamp. Day07", "Java Bootcamp. Day08", "Java Bootcamp. Day09", "Java Bootcamp. Team01"]}, {"title": "Career track", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 9, "projects": ["CT2_Dream_job", "CT1_Self_determination", "CT3_CV_Resume", "CT4_Interview_", "CT5_Teamwork_", "CT6_Corporate_culture ", "CT7_Corporate_Communication", "CT8_Career_planning", "CT9_Educational way"]}, {"title": "APG1_Backend", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-Go-T04B", "AP1-Go-T05B"]}, {"title": "A_Ex", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 1, "projects": ["A_Ex-t"]}, {"title": "APJ1_Bootcamp", "status": "REGISTERED", "percent": null, "projectsDone": 0, "projectsSeen": 4, "projects": ["AP1-Jv-T01", "AP1-Jv-T02", "AP1-Jv-P01", "AP1-Jv-T03"]}, {"title": "APG1_Bootcamp", "status": "REGISTERED", "percent": null, "projectsDone": 0, "projectsSeen": 4, "projects": ["AP1-Go-T01", "AP1-Go-T02", "AP1-Go-P01", "AP1-Go-T03"]}, {"title": "APG_Ex", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 1, "projects": ["APG_Ex-t"]}, {"title": "APK1_Bootcamp", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 4, "projects": ["AP1-Kt-T01", "AP1-Kt-T02", "AP1-Kt-P01", "AP1-Kt-T03"]}, {"title": "DS_Bootcamp_Part1", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 6, "projects": ["DSB1_UNIX_Command_Line_Tools_DELETE", "DSB2_Syntax&Semantics", "DSB3_OOP skills", "DSB4_Package management", "DSB5_Efficient code practices", "DSB6_MovieLens Analytics"]}, {"title": "APP_Ex", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 1, "projects": ["APP_Ex-t"]}, {"title": "APCS_Ex", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 1, "projects": ["APCS_Ex-t"]}, {"title": "DS_Bootcamp_Part2", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 6, "projects": ["DSB7_Pandas", "DSB8_SQL&Pandas", "DSB9_Pandas_SQL& Data Visual", "DSB10_Intro to ML", "DSB11_ML: Advanced", "DSB12_Food&nutrition"]}, {"title": "APJS1_Bootcamp", "status": "REGISTERED", "percent": null, "projectsDone": 0, "projectsSeen": 4, "projects": ["AP1-JS-T01", "AP1-JS-T02", "AP1-JS-P01", "AP1-JS-T03"]}, {"title": "APCS1_Bootcamp", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 4, "projects": ["AP1-CS-T01", "AP1-CS-T02", "AP1-CS-P01", "AP1-CS-T03"]}, {"title": "APS_Ex", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 1, "projects": ["APS_Ex-t"]}, {"title": "APJ_Ex", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 1, "projects": ["APJ_Ex-t"]}]}, "map": null, "logtime": {"weeks": [{"week": "2025-10-20", "hours": 8.01}, {"week": "2025-10-27", "hours": 2.28}, {"week": "2025-11-03", "hours": 3.35}, {"week": "2025-11-10", "hours": 2.17}, {"week": "2025-11-17", "hours": 3.05}, {"week": "2025-11-24", "hours": 2.25}, {"week": "2025-12-01", "hours": 2.89}, {"week": "2025-12-08", "hours": 3.32}, {"week": "2025-12-15", "hours": 1.31}, {"week": "2025-12-22", "hours": 1.93}, {"week": "2025-12-29", "hours": 1.08}, {"week": "2026-01-05", "hours": 3.13}, {"week": "2026-01-12", "hours": 2.14}, {"week": "2026-01-19", "hours": 1.46}, {"week": "2026-01-26", "hours": 2.16}, {"week": "2026-02-02", "hours": 2.67}, {"week": "2026-02-09", "hours": 2.15}, {"week": "2026-02-16", "hours": 3.33}, {"week": "2026-02-23", "hours": 5.09}, {"week": "2026-03-02", "hours": 3.09}, {"week": "2026-03-09", "hours": 0.99}, {"week": "2026-03-16", "hours": 0.0}, {"week": "2026-03-23", "hours": 0.85}, {"week": "2026-03-30", "hours": 1.44}, {"week": "2026-04-06", "hours": 0.0}, {"week": "2026-04-13", "hours": 0.48}, {"week": "2026-04-20", "hours": 0.0}, {"week": "2026-04-27", "hours": 0.24}, {"week": "2026-05-04", "hours": 0.0}, {"week": "2026-05-11", "hours": 0.72}, {"week": "2026-05-18", "hours": 0.0}, {"week": "2026-05-25", "hours": 0.0}, {"week": "2026-06-01", "hours": 0.0}, {"week": "2026-06-08", "hours": 0.0}, {"week": "2026-06-15", "hours": 3.72}, {"week": "2026-06-22", "hours": 0.0}, {"week": "2026-06-29", "hours": 0.95}, {"week": "2026-07-06", "hours": 0.41}, {"week": "2026-07-13", "hours": 0.4}, {"week": "2026-07-20", "hours": 1.67}, {"week": "2026-07-27", "hours": 1.99}, {"week": "2026-08-03", "hours": 0.04}, {"week": "2026-08-10", "hours": 0.0}, {"week": "2026-08-17", "hours": 3.74}, {"week": "2026-08-24", "hours": 0.21}, {"week": "2026-08-31", "hours": 0.0}, {"week": "2026-09-07", "hours": 0.0}, {"week": "2026-09-14", "hours": 0.0}, {"week": "2026-09-21", "hours": 0.0}, {"week": "2026-09-28", "hours": 0.0}, {"week": "2026-10-05", "hours": 0.13}, {"week": "2026-10-12", "hours": 0.0}], "typical": 2.1, "peak": {"week": "2025-10-20", "hours": 8.01}, "peakRatio": 3.9, "activeWeeks": 36, "totalWeeks": 52, "longestBreak": 5}, "feedback": {"rows": [{"key": "averageVerifierPunctuality", "label": "Punctuality", "value": 4.0}, {"key": "averageVerifierInterest", "label": "Interest", "value": 4.0}, {"key": "averageVerifierThoroughness", "label": "Thoroughness", "value": 4.0}, {"key": "averageVerifierFriendliness", "label": "Friendliness", "value": 4.0}], "title": "Clockwork", "scale": 4}, "skills": {"top": [{"name": "C", "points": 1691}, {"name": "Structured programming", "points": 1614}, {"name": "SQL", "points": 1188}, {"name": "Algorithms", "points": 599}, {"name": "Types and data structures", "points": 561}, {"name": "Linux", "points": 552}], "count": 14}, "badges": {"count": 45, "list": [{"name": "Such a listener", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=c8721354-1d80-4429-af26-a28723e6393b/8892c6b3-7f09-452c-b4a5-49d398cd0857/Such+a+listener.png", "date": "2025-05-26"}, {"name": "Such a listener", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=c8721354-1d80-4429-af26-a28723e6393b/8892c6b3-7f09-452c-b4a5-49d398cd0857/Such+a+listener.png", "date": "2025-05-26"}, {"name": "Real programmer", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=2c49b26a-6907-41b9-8c57-f82c09387352/5e03daa1-4472-4e0b-b00c-dc4b063f485a/Real+programmer.png", "date": "2025-05-28"}, {"name": "Such a listener", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=c8721354-1d80-4429-af26-a28723e6393b/8892c6b3-7f09-452c-b4a5-49d398cd0857/Such+a+listener.png", "date": "2025-06-03"}, {"name": "Real programmer", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=2c49b26a-6907-41b9-8c57-f82c09387352/5e03daa1-4472-4e0b-b00c-dc4b063f485a/Real+programmer.png", "date": "2025-06-13"}, {"name": "Mistakes are not for me", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=30842fcd-1d46-4f83-b959-d31541b4f0d2/89a50afa-34c0-4ce9-871f-499ec856fc71/Mistakes+are+not+for+me.png", "date": "2025-06-15"}, {"name": "Welcome on board", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=1e374b6f-f31d-4398-945d-bf74d921aa1b/6faf7e01-c914-4c99-b044-6899c633b33f/Welcome+on+board.png", "date": "2025-08-18"}, {"name": "Such a listener", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=c8721354-1d80-4429-af26-a28723e6393b/8892c6b3-7f09-452c-b4a5-49d398cd0857/Such+a+listener.png", "date": "2025-08-19"}, {"name": "Code Assassin 21", "icon": "/global/edce6144-55f8-4a35-8b11-785db7e55277?path=9dc4248f-4e63-40a8-8ced-6c90458e8be1/bf1d6201-07fb-47c6-a313-8ec16b4567ca/%D0%9F%D1%80%D0%B8%D0%BD%D1%8F%D1%82%D0%B8%D0%B5+%D1%80%D0%B5%D1%88%D0%B5%D0%BD%D0%B8%D0%B8%CC%86-1.png", "date": "2025-09-22"}, {"name": "Perfectionist", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=d0623c81-42dd-4e92-af6f-de12b54db314/9dcd6fce-c52c-44d0-8866-813afd6581a2/Perfectionist.png", "date": "2025-10-19"}, {"name": "Real programmer", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=2c49b26a-6907-41b9-8c57-f82c09387352/5e03daa1-4472-4e0b-b00c-dc4b063f485a/Real+programmer.png", "date": "2025-10-19"}, {"name": "Billionaire", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=92c0e92c-2814-4c97-bd2a-471797563df5/c79e3072-e183-42f0-8bdc-3ed307276911/Billionaire.png", "date": "2025-11-24"}, {"name": "P2P power 💪🏼", "icon": "/global/e7e1a836-d601-4c2c-8d80-eb8967d224ee?path=5a9c2ee7-d61e-4383-8b08-ac0980e15595/0a857985-40c5-42f7-9691-31b1740cf7b2/%D1%87%D0%B8%D0%BF+%D0%B8+%D0%B4%D0%B5%D0%B8%CC%86%D0%BB.png", "date": "2025-12-03"}, {"name": "Participant in a choir concert 🎶", "icon": "/global/6083d766-96c6-4d9d-847b-677f86e4e6bb?path=80020281-9fe3-4d1e-ba7b-f61b59d5700c/9a7b51c0-ef10-47af-b488-fe06e5b02aed/image+%289%29+%281%29-Photoroom.png", "date": "2025-12-26"}, {"name": "P2P power 💪🏼", "icon": "/global/e7e1a836-d601-4c2c-8d80-eb8967d224ee?path=5a9c2ee7-d61e-4383-8b08-ac0980e15595/0a857985-40c5-42f7-9691-31b1740cf7b2/%D1%87%D0%B8%D0%BF+%D0%B8+%D0%B4%D0%B5%D0%B8%CC%86%D0%BB.png", "date": "2025-12-30"}, {"name": "Career Commit", "icon": "/global/edce6144-55f8-4a35-8b11-785db7e55277?path=85557320-18c5-4a3b-ae15-5e7e3989389a/94239c6e-1459-48c5-8e3a-fd1b2e453b9d/%D0%9A%D1%80%D1%83%D1%82%D0%B0%D1%8F+%28%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F%29+%D0%B4%D0%B5%D0%BC%D0%BE%D0%BD%D1%81%D1%82%D1%80%D0%B0%D1%86%D0%B8%D1%8F-2.png", "date": "2026-01-21"}, {"name": "Participant in a choir concert 🎶", "icon": "/global/6083d766-96c6-4d9d-847b-677f86e4e6bb?path=80020281-9fe3-4d1e-ba7b-f61b59d5700c/9a7b51c0-ef10-47af-b488-fe06e5b02aed/image+%289%29+%281%29-Photoroom.png", "date": "2026-02-04"}, {"name": "Such a listener", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=c8721354-1d80-4429-af26-a28723e6393b/8892c6b3-7f09-452c-b4a5-49d398cd0857/Such+a+listener.png", "date": "2026-02-12"}, {"name": "Mistakes are not for me", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=30842fcd-1d46-4f83-b959-d31541b4f0d2/89a50afa-34c0-4ce9-871f-499ec856fc71/Mistakes+are+not+for+me.png", "date": "2026-03-10"}, {"name": "Participant in a choir concert 🎶", "icon": "/global/6083d766-96c6-4d9d-847b-677f86e4e6bb?path=80020281-9fe3-4d1e-ba7b-f61b59d5700c/9a7b51c0-ef10-47af-b488-fe06e5b02aed/image+%289%29+%281%29-Photoroom.png", "date": "2026-03-30"}, {"name": "Billionaire", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=92c0e92c-2814-4c97-bd2a-471797563df5/c79e3072-e183-42f0-8bdc-3ed307276911/Billionaire.png", "date": "2026-03-30"}, {"name": "Организатор квеста Space Unlocked 21", "icon": "/global/6c2a31f0-64be-4cc9-a086-ed73869a94db?path=2c0fd979-8d5a-4398-a0f9-9da25858b3e5/39838802-f898-4237-ab3d-55153ed5948a/%D0%9E%D1%80%D0%B3%D0%B0%D0%BD%D0%B8%D0%B7%D0%B0%D1%82%D0%BE%D1%80+%D0%BF%D0%BE%D1%81%D0%B2%D1%8F%D1%89%D0%B5%D0%BD%D0%B8%D1%8F+__+%D0%B2%D0%BE%D0%BB%D0%BD%D1%8B-2.png", "date": "2026-04-21"}, {"name": "Diva Club Anniversary", "icon": "/global/edce6144-55f8-4a35-8b11-785db7e55277?path=673a14ee-b448-4e01-bd4c-4d76dc620d98/25ddbd8c-0cee-4d5e-8a22-0da98820a732/IMG_7474+%281%29.png", "date": "2026-04-27"}, {"name": "Real programmer", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=2c49b26a-6907-41b9-8c57-f82c09387352/5e03daa1-4472-4e0b-b00c-dc4b063f485a/Real+programmer.png", "date": "2026-04-29"}, {"name": "Mistakes are not for me", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=30842fcd-1d46-4f83-b959-d31541b4f0d2/89a50afa-34c0-4ce9-871f-499ec856fc71/Mistakes+are+not+for+me.png", "date": "2026-05-01"}, {"name": "Participant in a choir concert 🎶", "icon": "/global/6083d766-96c6-4d9d-847b-677f86e4e6bb?path=80020281-9fe3-4d1e-ba7b-f61b59d5700c/9a7b51c0-ef10-47af-b488-fe06e5b02aed/image+%289%29+%281%29-Photoroom.png", "date": "2026-05-07"}, {"name": "P2P power 💪🏼", "icon": "/global/e7e1a836-d601-4c2c-8d80-eb8967d224ee?path=5a9c2ee7-d61e-4383-8b08-ac0980e15595/0a857985-40c5-42f7-9691-31b1740cf7b2/%D1%87%D0%B8%D0%BF+%D0%B8+%D0%B4%D0%B5%D0%B8%CC%86%D0%BB.png", "date": "2026-06-19"}, {"name": "Mistakes are not for me", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=30842fcd-1d46-4f83-b959-d31541b4f0d2/89a50afa-34c0-4ce9-871f-499ec856fc71/Mistakes+are+not+for+me.png", "date": "2026-07-04"}, {"name": "P2P power 💪🏼", "icon": "/global/e7e1a836-d601-4c2c-8d80-eb8967d224ee?path=5a9c2ee7-d61e-4383-8b08-ac0980e15595/0a857985-40c5-42f7-9691-31b1740cf7b2/%D1%87%D0%B8%D0%BF+%D0%B8+%D0%B4%D0%B5%D0%B8%CC%86%D0%BB.png", "date": "2026-07-06"}, {"name": "Организатор квеста Space Unlocked 21", "icon": "/global/6c2a31f0-64be-4cc9-a086-ed73869a94db?path=2c0fd979-8d5a-4398-a0f9-9da25858b3e5/39838802-f898-4237-ab3d-55153ed5948a/%D0%9E%D1%80%D0%B3%D0%B0%D0%BD%D0%B8%D0%B7%D0%B0%D1%82%D0%BE%D1%80+%D0%BF%D0%BE%D1%81%D0%B2%D1%8F%D1%89%D0%B5%D0%BD%D0%B8%D1%8F+__+%D0%B2%D0%BE%D0%BB%D0%BD%D1%8B-2.png", "date": "2026-07-06"}, {"name": "Birthday party in campus 🥳", "icon": "/global/edce6144-55f8-4a35-8b11-785db7e55277?path=23ab44c5-0470-4fe8-bcf5-fc96dbfa0003/843030f0-8f69-4b75-8778-a6034952a159/HB_campus.jpg", "date": "2026-07-08"}, {"name": "P2P power 💪🏼", "icon": "/global/e7e1a836-d601-4c2c-8d80-eb8967d224ee?path=5a9c2ee7-d61e-4383-8b08-ac0980e15595/0a857985-40c5-42f7-9691-31b1740cf7b2/%D1%87%D0%B8%D0%BF+%D0%B8+%D0%B4%D0%B5%D0%B8%CC%86%D0%BB.png", "date": "2026-07-10"}, {"name": "P2P power 💪🏼", "icon": "/global/e7e1a836-d601-4c2c-8d80-eb8967d224ee?path=5a9c2ee7-d61e-4383-8b08-ac0980e15595/0a857985-40c5-42f7-9691-31b1740cf7b2/%D1%87%D0%B8%D0%BF+%D0%B8+%D0%B4%D0%B5%D0%B8%CC%86%D0%BB.png", "date": "2026-07-10"}, {"name": "P2P power 💪🏼", "icon": "/global/e7e1a836-d601-4c2c-8d80-eb8967d224ee?path=5a9c2ee7-d61e-4383-8b08-ac0980e15595/0a857985-40c5-42f7-9691-31b1740cf7b2/%D1%87%D0%B8%D0%BF+%D0%B8+%D0%B4%D0%B5%D0%B8%CC%86%D0%BB.png", "date": "2026-07-21"}, {"name": "P2P power 💪🏼", "icon": "/global/e7e1a836-d601-4c2c-8d80-eb8967d224ee?path=5a9c2ee7-d61e-4383-8b08-ac0980e15595/0a857985-40c5-42f7-9691-31b1740cf7b2/%D1%87%D0%B8%D0%BF+%D0%B8+%D0%B4%D0%B5%D0%B8%CC%86%D0%BB.png", "date": "2026-07-21"}, {"name": "Singing buddy", "icon": "/global/edce6144-55f8-4a35-8b11-785db7e55277?path=58e5a364-2d77-4cd1-835d-26cad6b6e3e3/f4b5c3fe-64e4-46b3-b291-2ba91ee87536/IMG_20260727_110102_408.png", "date": "2026-07-28"}, {"name": "P2P power 💪🏼", "icon": "/global/e7e1a836-d601-4c2c-8d80-eb8967d224ee?path=5a9c2ee7-d61e-4383-8b08-ac0980e15595/0a857985-40c5-42f7-9691-31b1740cf7b2/%D1%87%D0%B8%D0%BF+%D0%B8+%D0%B4%D0%B5%D0%B8%CC%86%D0%BB.png", "date": "2026-07-28"}, {"name": "Attending a class hour", "icon": "/global/edce6144-55f8-4a35-8b11-785db7e55277?path=65c74819-16a7-4061-8e7d-e3469941973f/9ebb3e9b-da68-4565-a5d2-3d20e7cd0953/Event-2.png", "date": "2026-08-05"}, {"name": "Billionaire", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=92c0e92c-2814-4c97-bd2a-471797563df5/c79e3072-e183-42f0-8bdc-3ed307276911/Billionaire.png", "date": "2026-08-22"}, {"name": "Организатор квеста Space Unlocked 21", "icon": "/global/6c2a31f0-64be-4cc9-a086-ed73869a94db?path=2c0fd979-8d5a-4398-a0f9-9da25858b3e5/39838802-f898-4237-ab3d-55153ed5948a/%D0%9E%D1%80%D0%B3%D0%B0%D0%BD%D0%B8%D0%B7%D0%B0%D1%82%D0%BE%D1%80+%D0%BF%D0%BE%D1%81%D0%B2%D1%8F%D1%89%D0%B5%D0%BD%D0%B8%D1%8F+__+%D0%B2%D0%BE%D0%BB%D0%BD%D1%8B-2.png", "date": "2026-08-22"}, {"name": "Participant in a choir concert 🎶", "icon": "/global/6083d766-96c6-4d9d-847b-677f86e4e6bb?path=80020281-9fe3-4d1e-ba7b-f61b59d5700c/9a7b51c0-ef10-47af-b488-fe06e5b02aed/image+%289%29+%281%29-Photoroom.png", "date": "2026-08-27"}, {"name": "Honey Badgi Master", "icon": "/global/edce6144-55f8-4a35-8b11-785db7e55277?path=d8f87744-500c-45a1-8733-049c5685aba9/56b751be-9e13-401a-8d84-a1bc0fbef817/%D0%90%D1%87%D0%B8%D0%B2%D0%BA%D0%B0_%D0%BE%D1%80%D0%B8%D0%B3%D0%B0%D0%BC%D0%B8_%D0%BC%D0%B5%D0%B4%D0%BE%D0%B5%D0%B4.png", "date": "2026-09-30"}, {"name": "Mistakes are not for me", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=30842fcd-1d46-4f83-b959-d31541b4f0d2/89a50afa-34c0-4ce9-871f-499ec856fc71/Mistakes+are+not+for+me.png", "date": "2026-09-30"}, {"name": "Salamanders. Offline mode", "icon": "/global/edce6144-55f8-4a35-8b11-785db7e55277?path=bcf9be16-1873-4e9e-9b29-33b1eb418a1a/6c437ac7-1af5-49ee-af85-726d64667c27/Salamanders.+Offline+mode.png", "date": "2026-09-30"}, {"name": "Организатор квеста Space Unlocked 21", "icon": "/global/6c2a31f0-64be-4cc9-a086-ed73869a94db?path=2c0fd979-8d5a-4398-a0f9-9da25858b3e5/39838802-f898-4237-ab3d-55153ed5948a/%D0%9E%D1%80%D0%B3%D0%B0%D0%BD%D0%B8%D0%B7%D0%B0%D1%82%D0%BE%D1%80+%D0%BF%D0%BE%D1%81%D0%B2%D1%8F%D1%89%D0%B5%D0%BD%D0%B8%D1%8F+__+%D0%B2%D0%BE%D0%BB%D0%BD%D1%8B-2.png", "date": "2026-10-13"}]}, "points": {"peerReviewPoints": 11, "codeReviewPoints": 5, "coins": 597}, "coalition": {"coalitionId": 156, "name": "Salamanders", "rank": 197}, "persona": "Night Shift Project Machine"}</script>
-<script>
-(() => {
-  const S = JSON.parse(document.getElementById('story').textContent);
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+            .slide.on .rise {
+                animation: rise 0.65s cubic-bezier(0.2, 0.75, 0.2, 1) both;
+                animation-delay: calc(var(--i, 0) * 110ms);
+            }
+            .slide.on .bar {
+                animation: grow 0.7s cubic-bezier(0.2, 0.75, 0.2, 1) both;
+                animation-delay: calc(300ms + var(--d, 0ms));
+            }
+            .slide.on .hbar {
+                animation: widen 0.9s cubic-bezier(0.2, 0.75, 0.2, 1) both 0.35s;
+            }
+            .slide.on .line {
+                stroke-dasharray: 1;
+                animation: draw 1.4s ease-out both 0.3s;
+            }
+            .slide.on .cells i.on {
+                animation: pop 0.35s both;
+                animation-delay: calc(400ms + var(--d, 0ms));
+            }
+            @keyframes rise {
+                from {
+                    opacity: 0;
+                    transform: translateY(26px);
+                }
+            }
+            @keyframes grow {
+                from {
+                    transform: scaleY(0);
+                }
+            }
+            @keyframes widen {
+                from {
+                    width: 0;
+                }
+            }
+            @keyframes draw {
+                from {
+                    stroke-dashoffset: 1;
+                }
+                to {
+                    stroke-dashoffset: 0;
+                }
+            }
+            @keyframes pop {
+                from {
+                    transform: scale(0);
+                }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                .slide.on .rise,
+                .slide.on .bar,
+                .slide.on .hbar,
+                .slide.on .line,
+                .slide.on .cells i.on {
+                    animation: none;
+                }
+                #stage {
+                    transition: none;
+                }
+            }
+            @media (min-width: 720px) {
+                .slide {
+                    padding: 72px 48px 80px;
+                }
+                .inner {
+                    gap: 22px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="stage">
+            <div id="bars" aria-label="Slides"></div>
+            <main id="slides"></main>
+            <div id="nav">
+                <button id="prev" aria-label="Previous slide">‹</button>
+                <button id="next" aria-label="Next slide">›</button>
+            </div>
+        </div>
+        <div id="tip" role="tooltip"></div>
+        <script id="story" type="application/json">
+            {"login": "zhaojyne", "participant": {"login": "zhaojyne", "className": "25_08_MSK", "parallelName": "Core program", "expValue": 7923, "level": 9, "expToNextLevel": 1776, "campus": {"id": "6bfe3c56-0211-4fe1-9e59-51616caac4dd", "shortName": "21 Moscow"}, "status": "ACTIVE"}, "fetchedAt": "2026-10-13T19:46:04.890036", "projects": {"done": 25, "failed": 0, "active": 14, "byType": {"INDIVIDUAL": 19, "GROUP": 5, "EXAM_TEST": 1}, "activeTitles": ["DO5_SimpleDocker", "AP1-Go-T01", "C7_BrickGame_v1.0", "AP1-JS-T01", "AP1-Py-T03", "A1_Maze_C", "PjM1_ProjPM", "BSA00_Decomposition", "PG1_Pangolin", "CbS1_Networking_basics_Part 1", "QA1_Foundation", "UX/UI1_Intro", "PM1_PMStarterPack", "Core_Strategy"], "failedTitles": []}, "grades": {"average": 103, "best": {"title": "DO2_Linux Network", "score": 140}, "closest": {"title": "SQL_Ex-t", "score": 63}, "over100": 4, "exactly100": 18, "max": 140, "scores": [63, 95, 95, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120, 126, 136, 140]}, "timeline": {"first": {"title": "C2_SimpleBashUtils", "date": "2025-10-19"}, "latest": {"title": "AP1-Py-P01", "date": "2026-09-30"}, "months": [{"month": "2025-10", "count": 1}, {"month": "2025-11", "count": 1}, {"month": "2025-12", "count": 0}, {"month": "2026-01", "count": 1}, {"month": "2026-02", "count": 3}, {"month": "2026-03", "count": 4}, {"month": "2026-04", "count": 3}, {"month": "2026-05", "count": 3}, {"month": "2026-06", "count": 2}, {"month": "2026-07", "count": 1}, {"month": "2026-08", "count": 4}, {"month": "2026-09", "count": 2}], "peakMonth": {"month": "2026-03", "count": 4}, "drought": {"days": 68, "from": "2025-11-06", "brokenBy": "C5_s21_decimal"}, "rushWeek": {"count": 6, "from": "2026-04-26"}}, "clock": {"hours": [1, 0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 1, 2, 1, 0, 2, 1, 2, 3, 1, 1, 1, 2, 4], "weekdays": [{"day": "Mon", "count": 2}, {"day": "Tue", "count": 3}, {"day": "Wed", "count": 5}, {"day": "Thu", "count": 3}, {"day": "Fri", "count": 2}, {"day": "Sat", "count": 5}, {"day": "Sun", "count": 5}], "peakHour": 23, "persona": "night"}, "squad": {"groupProjects": 5, "teamlead": 0, "uniqueMates": 7, "mates": [{"login": "mixedwhi", "count": 2}, {"login": "basiliaq", "count": 2}, {"login": "titanlig", "count": 1}, {"login": "jorgenzi", "count": 1}, {"login": "jolineil", "count": 1}, {"login": "hermilbr", "count": 1}, {"login": "stonetrs", "count": 1}]}, "courses": {"done": 3, "total": 48, "list": [{"title": "SQL1", "status": "ACCEPTED", "percent": 100, "projectsDone": 12, "projectsSeen": 12, "projects": ["SQLB2_Retrieving data", "SQLB3_Retrieving data deep dive", "SQLB4_DML", "SQLB5_Snapshots", "SQLB7_Database index ", "SQLB8_Integrating features", "SQLB9_OLAP", "SQLB10_Isolation levels", "SQLB11_Functions and procs", "SQLB12_Warehouse fundamentals", "SQLB1_Basics", "SQLB6_Salesman problem"]}, {"title": "CT_Part1", "status": "ACCEPTED", "percent": 100, "projectsDone": 2, "projectsSeen": 2, "projects": ["CT1_Self-determination", "CT2_Dream job"]}, {"title": "SQL_Ex", "status": "ACCEPTED", "percent": 63, "projectsDone": 1, "projectsSeen": 1, "projects": ["SQL_Ex-t"]}, {"title": "APP1_Bootcamp", "status": "IN_PROGRESS", "percent": null, "projectsDone": 3, "projectsSeen": 4, "projects": ["AP1-Py-T01", "AP1-Py-T02", "AP1-Py-P01", "AP1-Py-T03"]}, {"title": "CT_Part2", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 6, "projects": ["CT3_CV Resume", "CT4_Interview", "CT5_Teamwork", "CT6_Corporate culture", "CT7_Corporate Communication", "CT8_Career planning"]}, {"title": "Frontend Bootcamp", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 14, "projects": ["FEB1_JS", "FEB2_Native JS", "FEB3_HTML and CSS", "FEB4_Advanced Web", "FEB5_Express framework", "FEB6_HTML templating", "FEB7_SeaBattle game", "FEB8_React", "FEB9_Memoization", "FEB10_Data storages", "FEB11_Routing", "FEB12_React Redux", "FEB13_TypeScript", "FEB14_Web Building"]}, {"title": "APJ1_Backend", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-Jv-T04B", "AP1-Jv-T05B"]}, {"title": "APP1", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 12, "projects": ["APP1 Bootcamp. Day00", "APP1 Bootcamp. Day01", "APP1 Bootcamp. Day03", "APP1 Bootcamp. Day02", "APP1 Bootcamp. Day04", "APP1 Bootcamp. Team00", "APP1 Bootcamp. Day05", "APP1 Bootcamp. Day06", "APP1 Bootcamp. Day07", "APP1 Bootcamp. Day08", "APP1 Bootcamp. Team01", "APP1 Bootcamp. Day09"]}, {"title": "APP1_Backend", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-Py-T04B", "AP1-Py-T05B"]}, {"title": "APK1_Mobile", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-Kt-T04M", "AP1-Kt-T05M"]}, {"title": "APJ1_Mobile", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-Jv-T04M", "AP1-Jv-T05M"]}, {"title": "CPP_Ex", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["CPP_Ex-p", "CPP_Ex-t"]}, {"title": "Swift Bootcamp", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 12, "projects": ["Swift Bootcamp. Day00", "Swift Bootcamp. Day01", "Swift Bootcamp. Day02", "Swift Bootcamp. Day03", "Swift Bootcamp. Day04", "Swift Bootcamp. Team00", "Swift Bootcamp. Day05", "Swift Bootcamp. Day06", "Swift Bootcamp. Day07", "Swift Bootcamp. Day08", "Swift Bootcamp. Day09", "Swift Bootcamp. Team01"]}, {"title": "Electrical Engineering Bootcamp", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 13, "projects": ["EEB1_Basics", "EEB2_AC circuit analysis", "EEB3_Circuit calc", "EEB4_Connection circuits", "EEB5_Operational amplifiers", "EEB6_Filters", "EEB7_Speed control", "EEB8_Arduino boards", "EEB9_Module integration", "EEB10_STM fundamentals", "EEB11_STM code", "EEB12_Transferring data", "EEB13_Satellite odometer"]}, {"title": "C_Ex", "status": "REGISTERED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["C_Ex-t", "C_Ex-p"]}, {"title": "APK1_Backend", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-Kt-T04B", "AP1-Kt-T05B"]}, {"title": "APS1_Mobile", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-Sw-T04M", "AP1-Sw-T05M"]}, {"title": "APG1", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 12, "projects": ["APG1 Bootcamp. Day00", "APG1 Bootcamp.  Day01", "APG1 Bootcamp. Day02", "APG1 Bootcamp. Day03", "APG1 Bootcamp. Day04", "APG1 Bootcamp.  Day05", "APG1 Bootcamp.  Day06", "APG1 Bootcamp. Day07", "APG1 Bootcamp. Day08", "APG1 Bootcamp. Day09", "APG1 Bootcamp. Team00", "APG1 Bootcamp. Team01"]}, {"title": "CPPE", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["CPP Exam", "CPPE-T"]}, {"title": "Data Science Bootcamp", "status": "REGISTERED", "percent": null, "projectsDone": 0, "projectsSeen": 12, "projects": ["DSB1_UNIX Command Line Tools_", "DSB2_Syntax&Semantics_", "DSB3_OOP skills_", "DSB4_Package management_", "DSB5_Efficient code practices_", "DSB6_MovieLens Analytics_", "DSB7_Pandas_", "DSB8_SQL&Pandas_", "DSB9_Pandas_SQL& Data Visual_", "DSB10_Intro to ML_", "DSB11_ML: Advanced_", "DSB12_Food&nutrition_"]}, {"title": "APS1_Bootcamp", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 4, "projects": ["AP1-Sw-T01", "AP1-Sw-T02", "AP1-Sw-P01", "AP1-Sw-T03"]}, {"title": "APJS_Ex", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 1, "projects": ["APJS_Ex-t"]}, {"title": "APC1", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 11, "projects": ["APC1 Bootcamp. Day00", "APC1 Bootcamp. Day01", "APC1 Bootcamp. Day02", "APC1 Bootcamp. Day03", "APC1 Bootcamp. Day04", "APC1 Bootcamp. Day05", "APC1 Bootcamp. Day06", "APC1 Bootcamp. Day07", "APC1 Bootcamp. Day08", "APC1 Bootcamp. Team01", "APC1 Bootcamp. Team00"]}, {"title": "APS1_Backend", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-Sw-T04B", "AP1-Sw-T05B"]}, {"title": "ROS Bootcamp", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 12, "projects": ["ROSB1_Intro", "ROSB2_Advanced node", "ROSB3_TF library ", "ROSB4_Robot simulation", "ROSB5_Robot sensor ", "ROSB7_Robot mapping", "ROSB8_Robot navigation", "ROSB9_MoveIt arm control", "ROSB10_Computer vision ", "ROSB11_Robot behaviors ", "ROSB6_Robot programming", "ROSB12_Robotics Pro"]}, {"title": "Core final exam", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["Core final testing", "Core final exam"]}, {"title": "Kotlin Bootcamp", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 12, "projects": ["Kotlin Bootcamp. Day00", "Kotlin Bootcamp. Day01", "Kotlin Bootcamp. Day02", "Kotlin Bootcamp. Day03", "Kotlin Bootcamp. Day04", "Kotlin Bootcamp. Team00", "Kotlin Bootcamp. Day05", "Kotlin Bootcamp. Day06", "Kotlin Bootcamp. Day07", "Kotlin Bootcamp. Day08", "Kotlin Bootcamp. Day09", "Kotlin Bootcamp. Team01"]}, {"title": "DB Bootcamp", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 12, "projects": ["DB Bootcamp. Day00", "DB Bootcamp. Day01", "DB Bootcamp. Day02", "DB Bootcamp. Day03", "DB Bootcamp. Day04", "DB Bootcamp. Day05", "DB Bootcamp. Day06", "DB Bootcamp. Day07", "DB Bootcamp. Day08", "DB Bootcamp. Day09", "DB Bootcamp. Team00", "DB Bootcamp. Team01"]}, {"title": "APCS1_Backend", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-CS-T04B", "AP1-CS-T05B"]}, {"title": "APJS1_Backend", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-JS-T04B", "AP1-JS-T05B"]}, {"title": "APJS1_Frontend", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-JS-T04F", "AP1-JS-T05F"]}, {"title": "APK_Ex", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 1, "projects": ["APK_Ex-t"]}, {"title": "APJ1", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 12, "projects": ["Java Bootcamp. Day00", "Java Bootcamp. Day01", "Java Bootcamp. Day02", "Java Bootcamp. Day03", "Java Bootcamp. Day04", "Java Bootcamp. Team00", "Java Bootcamp. Day05", "Java Bootcamp. Day06", "Java Bootcamp. Day07", "Java Bootcamp. Day08", "Java Bootcamp. Day09", "Java Bootcamp. Team01"]}, {"title": "Career track", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 9, "projects": ["CT2_Dream_job", "CT1_Self_determination", "CT3_CV_Resume", "CT4_Interview_", "CT5_Teamwork_", "CT6_Corporate_culture ", "CT7_Corporate_Communication", "CT8_Career_planning", "CT9_Educational way"]}, {"title": "APG1_Backend", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 2, "projects": ["AP1-Go-T04B", "AP1-Go-T05B"]}, {"title": "A_Ex", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 1, "projects": ["A_Ex-t"]}, {"title": "APJ1_Bootcamp", "status": "REGISTERED", "percent": null, "projectsDone": 0, "projectsSeen": 4, "projects": ["AP1-Jv-T01", "AP1-Jv-T02", "AP1-Jv-P01", "AP1-Jv-T03"]}, {"title": "APG1_Bootcamp", "status": "REGISTERED", "percent": null, "projectsDone": 0, "projectsSeen": 4, "projects": ["AP1-Go-T01", "AP1-Go-T02", "AP1-Go-P01", "AP1-Go-T03"]}, {"title": "APG_Ex", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 1, "projects": ["APG_Ex-t"]}, {"title": "APK1_Bootcamp", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 4, "projects": ["AP1-Kt-T01", "AP1-Kt-T02", "AP1-Kt-P01", "AP1-Kt-T03"]}, {"title": "DS_Bootcamp_Part1", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 6, "projects": ["DSB1_UNIX_Command_Line_Tools_DELETE", "DSB2_Syntax&Semantics", "DSB3_OOP skills", "DSB4_Package management", "DSB5_Efficient code practices", "DSB6_MovieLens Analytics"]}, {"title": "APP_Ex", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 1, "projects": ["APP_Ex-t"]}, {"title": "APCS_Ex", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 1, "projects": ["APCS_Ex-t"]}, {"title": "DS_Bootcamp_Part2", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 6, "projects": ["DSB7_Pandas", "DSB8_SQL&Pandas", "DSB9_Pandas_SQL& Data Visual", "DSB10_Intro to ML", "DSB11_ML: Advanced", "DSB12_Food&nutrition"]}, {"title": "APJS1_Bootcamp", "status": "REGISTERED", "percent": null, "projectsDone": 0, "projectsSeen": 4, "projects": ["AP1-JS-T01", "AP1-JS-T02", "AP1-JS-P01", "AP1-JS-T03"]}, {"title": "APCS1_Bootcamp", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 4, "projects": ["AP1-CS-T01", "AP1-CS-T02", "AP1-CS-P01", "AP1-CS-T03"]}, {"title": "APS_Ex", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 1, "projects": ["APS_Ex-t"]}, {"title": "APJ_Ex", "status": "ASSIGNED", "percent": null, "projectsDone": 0, "projectsSeen": 1, "projects": ["APJ_Ex-t"]}]}, "map": {"done": 25, "active": 2, "branchesCleared": [], "branches": [{"label": "SQL - I", "done": 13, "active": 0, "total": 14, "cells": [{"title": "SQL_Ex-t", "state": "done"}, {"title": "SQLB1_Basics", "state": "done"}, {"title": "SQLB2_Retrieving data", "state": "done"}, {"title": "SQLB3_Retrieving data deep dive", "state": "done"}, {"title": "SQLB4_DML", "state": "done"}, {"title": "SQLB5_Snapshots", "state": "done"}, {"title": "SQLB6_Salesman problem", "state": "done"}, {"title": "SQLB7_Database index ", "state": "done"}, {"title": "SQLB8_Integrating features", "state": "done"}, {"title": "SQLB9_OLAP", "state": "done"}, {"title": "SQLB10_Isolation levels", "state": "done"}, {"title": "SQLB11_Functions and procs", "state": "done"}, {"title": "SQLB12_Warehouse fundamentals", "state": "done"}, {"title": "SQL_Ex-p", "state": "todo"}]}, {"label": "C - I", "done": 4, "active": 0, "total": 6, "cells": [{"title": "C6_s21_matrix", "state": "done"}, {"title": "C5_s21_decimal", "state": "done"}, {"title": "C3_s21_stringplus", "state": "done"}, {"title": "C2_SimpleBashUtils", "state": "done"}, {"title": "C_Ex-p", "state": "todo"}, {"title": "C_Ex-t", "state": "todo"}]}, {"label": "Python Bootcamp", "done": 3, "active": 1, "total": 7, "cells": [{"title": "AP1-Py-P01", "state": "done"}, {"title": "AP1-Py-T01", "state": "done"}, {"title": "AP1-Py-T02", "state": "done"}, {"title": "AP1-Py-T03", "state": "active"}, {"title": "AP1-Py-T04B", "state": "todo"}, {"title": "AP1-Py-T05B", "state": "todo"}, {"title": "APP_Ex-t", "state": "todo"}]}, {"label": "DO - I", "done": 2, "active": 0, "total": 7, "cells": [{"title": "DO2_Linux Network", "state": "done"}, {"title": "DO1_Linux", "state": "done"}, {"title": "DO_Ex-t", "state": "todo"}, {"title": "DO6_CICD", "state": "todo"}, {"title": "DO5_SimpleDocker", "state": "todo"}, {"title": "DO3_LinuxMonitoring v1.0", "state": "todo"}, {"title": "DO4_LinuxMonitoring v2.0", "state": "todo"}]}, {"label": "Career Track", "done": 2, "active": 0, "total": 10, "cells": [{"title": "CT1_Self-determination", "state": "done"}, {"title": "CT2_Dream job", "state": "done"}, {"title": "CT3_CV_Resume", "state": "todo"}, {"title": "CT4_Interview_", "state": "todo"}, {"title": "CT5_Teamwork_", "state": "todo"}, {"title": "CT6_Corporate_culture ", "state": "todo"}, {"title": "CT7_Corporate_Communication", "state": "todo"}, {"title": "CT8_Career_planning", "state": "todo"}, {"title": "CT9_Educational way", "state": "todo"}, {"title": "CT_Part3", "state": "todo"}]}, {"label": "CPP - I", "done": 1, "active": 0, "total": 6, "cells": [{"title": "CPP1_s21_matrix+", "state": "done"}, {"title": "CPP_Ex-p", "state": "todo"}, {"title": "CPP_Ex-t", "state": "todo"}, {"title": "CPP4_3DViewer_v2.0", "state": "todo"}, {"title": "CPP3_BrickGame_v2.0", "state": "todo"}, {"title": "CPP2_s21_containers", "state": "todo"}]}]}, "logtime": {"weeks": [{"week": "2025-10-20", "hours": 8.01}, {"week": "2025-10-27", "hours": 2.28}, {"week": "2025-11-03", "hours": 3.35}, {"week": "2025-11-10", "hours": 2.17}, {"week": "2025-11-17", "hours": 3.05}, {"week": "2025-11-24", "hours": 2.25}, {"week": "2025-12-01", "hours": 2.89}, {"week": "2025-12-08", "hours": 3.32}, {"week": "2025-12-15", "hours": 1.31}, {"week": "2025-12-22", "hours": 1.93}, {"week": "2025-12-29", "hours": 1.08}, {"week": "2026-01-05", "hours": 3.13}, {"week": "2026-01-12", "hours": 2.14}, {"week": "2026-01-19", "hours": 1.46}, {"week": "2026-01-26", "hours": 2.16}, {"week": "2026-02-02", "hours": 2.67}, {"week": "2026-02-09", "hours": 2.15}, {"week": "2026-02-16", "hours": 3.33}, {"week": "2026-02-23", "hours": 5.09}, {"week": "2026-03-02", "hours": 3.09}, {"week": "2026-03-09", "hours": 0.99}, {"week": "2026-03-16", "hours": 0.0}, {"week": "2026-03-23", "hours": 0.85}, {"week": "2026-03-30", "hours": 1.44}, {"week": "2026-04-06", "hours": 0.0}, {"week": "2026-04-13", "hours": 0.48}, {"week": "2026-04-20", "hours": 0.0}, {"week": "2026-04-27", "hours": 0.24}, {"week": "2026-05-04", "hours": 0.0}, {"week": "2026-05-11", "hours": 0.72}, {"week": "2026-05-18", "hours": 0.0}, {"week": "2026-05-25", "hours": 0.0}, {"week": "2026-06-01", "hours": 0.0}, {"week": "2026-06-08", "hours": 0.0}, {"week": "2026-06-15", "hours": 3.72}, {"week": "2026-06-22", "hours": 0.0}, {"week": "2026-06-29", "hours": 0.95}, {"week": "2026-07-06", "hours": 0.41}, {"week": "2026-07-13", "hours": 0.4}, {"week": "2026-07-20", "hours": 1.67}, {"week": "2026-07-27", "hours": 1.99}, {"week": "2026-08-03", "hours": 0.04}, {"week": "2026-08-10", "hours": 0.0}, {"week": "2026-08-17", "hours": 3.74}, {"week": "2026-08-24", "hours": 0.21}, {"week": "2026-08-31", "hours": 0.0}, {"week": "2026-09-07", "hours": 0.0}, {"week": "2026-09-14", "hours": 0.0}, {"week": "2026-09-21", "hours": 0.0}, {"week": "2026-09-28", "hours": 0.0}, {"week": "2026-10-05", "hours": 0.13}, {"week": "2026-10-12", "hours": 0.0}], "typical": 2.1, "peak": {"week": "2025-10-20", "hours": 8.01}, "peakRatio": 3.9, "activeWeeks": 36, "totalWeeks": 52, "longestBreak": 5}, "feedback": {"rows": [{"key": "averageVerifierPunctuality", "label": "Punctuality", "value": 4.0}, {"key": "averageVerifierInterest", "label": "Interest", "value": 4.0}, {"key": "averageVerifierThoroughness", "label": "Thoroughness", "value": 4.0}, {"key": "averageVerifierFriendliness", "label": "Friendliness", "value": 4.0}], "title": "Clockwork", "scale": 4}, "skills": {"top": [{"name": "C", "points": 1691}, {"name": "Structured programming", "points": 1614}, {"name": "SQL", "points": 1188}, {"name": "Algorithms", "points": 599}, {"name": "Types and data structures", "points": 561}, {"name": "Linux", "points": 552}], "count": 14}, "badges": {"count": 45, "list": [{"name": "Such a listener", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=c8721354-1d80-4429-af26-a28723e6393b/8892c6b3-7f09-452c-b4a5-49d398cd0857/Such+a+listener.png", "date": "2025-05-26"}, {"name": "Such a listener", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=c8721354-1d80-4429-af26-a28723e6393b/8892c6b3-7f09-452c-b4a5-49d398cd0857/Such+a+listener.png", "date": "2025-05-26"}, {"name": "Real programmer", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=2c49b26a-6907-41b9-8c57-f82c09387352/5e03daa1-4472-4e0b-b00c-dc4b063f485a/Real+programmer.png", "date": "2025-05-28"}, {"name": "Such a listener", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=c8721354-1d80-4429-af26-a28723e6393b/8892c6b3-7f09-452c-b4a5-49d398cd0857/Such+a+listener.png", "date": "2025-06-03"}, {"name": "Real programmer", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=2c49b26a-6907-41b9-8c57-f82c09387352/5e03daa1-4472-4e0b-b00c-dc4b063f485a/Real+programmer.png", "date": "2025-06-13"}, {"name": "Mistakes are not for me", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=30842fcd-1d46-4f83-b959-d31541b4f0d2/89a50afa-34c0-4ce9-871f-499ec856fc71/Mistakes+are+not+for+me.png", "date": "2025-06-15"}, {"name": "Welcome on board", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=1e374b6f-f31d-4398-945d-bf74d921aa1b/6faf7e01-c914-4c99-b044-6899c633b33f/Welcome+on+board.png", "date": "2025-08-18"}, {"name": "Such a listener", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=c8721354-1d80-4429-af26-a28723e6393b/8892c6b3-7f09-452c-b4a5-49d398cd0857/Such+a+listener.png", "date": "2025-08-19"}, {"name": "Code Assassin 21", "icon": "/global/edce6144-55f8-4a35-8b11-785db7e55277?path=9dc4248f-4e63-40a8-8ced-6c90458e8be1/bf1d6201-07fb-47c6-a313-8ec16b4567ca/%D0%9F%D1%80%D0%B8%D0%BD%D1%8F%D1%82%D0%B8%D0%B5+%D1%80%D0%B5%D1%88%D0%B5%D0%BD%D0%B8%D0%B8%CC%86-1.png", "date": "2025-09-22"}, {"name": "Perfectionist", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=d0623c81-42dd-4e92-af6f-de12b54db314/9dcd6fce-c52c-44d0-8866-813afd6581a2/Perfectionist.png", "date": "2025-10-19"}, {"name": "Real programmer", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=2c49b26a-6907-41b9-8c57-f82c09387352/5e03daa1-4472-4e0b-b00c-dc4b063f485a/Real+programmer.png", "date": "2025-10-19"}, {"name": "Billionaire", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=92c0e92c-2814-4c97-bd2a-471797563df5/c79e3072-e183-42f0-8bdc-3ed307276911/Billionaire.png", "date": "2025-11-24"}, {"name": "P2P power 💪🏼", "icon": "/global/e7e1a836-d601-4c2c-8d80-eb8967d224ee?path=5a9c2ee7-d61e-4383-8b08-ac0980e15595/0a857985-40c5-42f7-9691-31b1740cf7b2/%D1%87%D0%B8%D0%BF+%D0%B8+%D0%B4%D0%B5%D0%B8%CC%86%D0%BB.png", "date": "2025-12-03"}, {"name": "Participant in a choir concert 🎶", "icon": "/global/6083d766-96c6-4d9d-847b-677f86e4e6bb?path=80020281-9fe3-4d1e-ba7b-f61b59d5700c/9a7b51c0-ef10-47af-b488-fe06e5b02aed/image+%289%29+%281%29-Photoroom.png", "date": "2025-12-26"}, {"name": "P2P power 💪🏼", "icon": "/global/e7e1a836-d601-4c2c-8d80-eb8967d224ee?path=5a9c2ee7-d61e-4383-8b08-ac0980e15595/0a857985-40c5-42f7-9691-31b1740cf7b2/%D1%87%D0%B8%D0%BF+%D0%B8+%D0%B4%D0%B5%D0%B8%CC%86%D0%BB.png", "date": "2025-12-30"}, {"name": "Career Commit", "icon": "/global/edce6144-55f8-4a35-8b11-785db7e55277?path=85557320-18c5-4a3b-ae15-5e7e3989389a/94239c6e-1459-48c5-8e3a-fd1b2e453b9d/%D0%9A%D1%80%D1%83%D1%82%D0%B0%D1%8F+%28%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F%29+%D0%B4%D0%B5%D0%BC%D0%BE%D0%BD%D1%81%D1%82%D1%80%D0%B0%D1%86%D0%B8%D1%8F-2.png", "date": "2026-01-21"}, {"name": "Participant in a choir concert 🎶", "icon": "/global/6083d766-96c6-4d9d-847b-677f86e4e6bb?path=80020281-9fe3-4d1e-ba7b-f61b59d5700c/9a7b51c0-ef10-47af-b488-fe06e5b02aed/image+%289%29+%281%29-Photoroom.png", "date": "2026-02-04"}, {"name": "Such a listener", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=c8721354-1d80-4429-af26-a28723e6393b/8892c6b3-7f09-452c-b4a5-49d398cd0857/Such+a+listener.png", "date": "2026-02-12"}, {"name": "Mistakes are not for me", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=30842fcd-1d46-4f83-b959-d31541b4f0d2/89a50afa-34c0-4ce9-871f-499ec856fc71/Mistakes+are+not+for+me.png", "date": "2026-03-10"}, {"name": "Participant in a choir concert 🎶", "icon": "/global/6083d766-96c6-4d9d-847b-677f86e4e6bb?path=80020281-9fe3-4d1e-ba7b-f61b59d5700c/9a7b51c0-ef10-47af-b488-fe06e5b02aed/image+%289%29+%281%29-Photoroom.png", "date": "2026-03-30"}, {"name": "Billionaire", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=92c0e92c-2814-4c97-bd2a-471797563df5/c79e3072-e183-42f0-8bdc-3ed307276911/Billionaire.png", "date": "2026-03-30"}, {"name": "Организатор квеста Space Unlocked 21", "icon": "/global/6c2a31f0-64be-4cc9-a086-ed73869a94db?path=2c0fd979-8d5a-4398-a0f9-9da25858b3e5/39838802-f898-4237-ab3d-55153ed5948a/%D0%9E%D1%80%D0%B3%D0%B0%D0%BD%D0%B8%D0%B7%D0%B0%D1%82%D0%BE%D1%80+%D0%BF%D0%BE%D1%81%D0%B2%D1%8F%D1%89%D0%B5%D0%BD%D0%B8%D1%8F+__+%D0%B2%D0%BE%D0%BB%D0%BD%D1%8B-2.png", "date": "2026-04-21"}, {"name": "Diva Club Anniversary", "icon": "/global/edce6144-55f8-4a35-8b11-785db7e55277?path=673a14ee-b448-4e01-bd4c-4d76dc620d98/25ddbd8c-0cee-4d5e-8a22-0da98820a732/IMG_7474+%281%29.png", "date": "2026-04-27"}, {"name": "Real programmer", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=2c49b26a-6907-41b9-8c57-f82c09387352/5e03daa1-4472-4e0b-b00c-dc4b063f485a/Real+programmer.png", "date": "2026-04-29"}, {"name": "Mistakes are not for me", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=30842fcd-1d46-4f83-b959-d31541b4f0d2/89a50afa-34c0-4ce9-871f-499ec856fc71/Mistakes+are+not+for+me.png", "date": "2026-05-01"}, {"name": "Participant in a choir concert 🎶", "icon": "/global/6083d766-96c6-4d9d-847b-677f86e4e6bb?path=80020281-9fe3-4d1e-ba7b-f61b59d5700c/9a7b51c0-ef10-47af-b488-fe06e5b02aed/image+%289%29+%281%29-Photoroom.png", "date": "2026-05-07"}, {"name": "P2P power 💪🏼", "icon": "/global/e7e1a836-d601-4c2c-8d80-eb8967d224ee?path=5a9c2ee7-d61e-4383-8b08-ac0980e15595/0a857985-40c5-42f7-9691-31b1740cf7b2/%D1%87%D0%B8%D0%BF+%D0%B8+%D0%B4%D0%B5%D0%B8%CC%86%D0%BB.png", "date": "2026-06-19"}, {"name": "Mistakes are not for me", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=30842fcd-1d46-4f83-b959-d31541b4f0d2/89a50afa-34c0-4ce9-871f-499ec856fc71/Mistakes+are+not+for+me.png", "date": "2026-07-04"}, {"name": "P2P power 💪🏼", "icon": "/global/e7e1a836-d601-4c2c-8d80-eb8967d224ee?path=5a9c2ee7-d61e-4383-8b08-ac0980e15595/0a857985-40c5-42f7-9691-31b1740cf7b2/%D1%87%D0%B8%D0%BF+%D0%B8+%D0%B4%D0%B5%D0%B8%CC%86%D0%BB.png", "date": "2026-07-06"}, {"name": "Организатор квеста Space Unlocked 21", "icon": "/global/6c2a31f0-64be-4cc9-a086-ed73869a94db?path=2c0fd979-8d5a-4398-a0f9-9da25858b3e5/39838802-f898-4237-ab3d-55153ed5948a/%D0%9E%D1%80%D0%B3%D0%B0%D0%BD%D0%B8%D0%B7%D0%B0%D1%82%D0%BE%D1%80+%D0%BF%D0%BE%D1%81%D0%B2%D1%8F%D1%89%D0%B5%D0%BD%D0%B8%D1%8F+__+%D0%B2%D0%BE%D0%BB%D0%BD%D1%8B-2.png", "date": "2026-07-06"}, {"name": "Birthday party in campus 🥳", "icon": "/global/edce6144-55f8-4a35-8b11-785db7e55277?path=23ab44c5-0470-4fe8-bcf5-fc96dbfa0003/843030f0-8f69-4b75-8778-a6034952a159/HB_campus.jpg", "date": "2026-07-08"}, {"name": "P2P power 💪🏼", "icon": "/global/e7e1a836-d601-4c2c-8d80-eb8967d224ee?path=5a9c2ee7-d61e-4383-8b08-ac0980e15595/0a857985-40c5-42f7-9691-31b1740cf7b2/%D1%87%D0%B8%D0%BF+%D0%B8+%D0%B4%D0%B5%D0%B8%CC%86%D0%BB.png", "date": "2026-07-10"}, {"name": "P2P power 💪🏼", "icon": "/global/e7e1a836-d601-4c2c-8d80-eb8967d224ee?path=5a9c2ee7-d61e-4383-8b08-ac0980e15595/0a857985-40c5-42f7-9691-31b1740cf7b2/%D1%87%D0%B8%D0%BF+%D0%B8+%D0%B4%D0%B5%D0%B8%CC%86%D0%BB.png", "date": "2026-07-10"}, {"name": "P2P power 💪🏼", "icon": "/global/e7e1a836-d601-4c2c-8d80-eb8967d224ee?path=5a9c2ee7-d61e-4383-8b08-ac0980e15595/0a857985-40c5-42f7-9691-31b1740cf7b2/%D1%87%D0%B8%D0%BF+%D0%B8+%D0%B4%D0%B5%D0%B8%CC%86%D0%BB.png", "date": "2026-07-21"}, {"name": "P2P power 💪🏼", "icon": "/global/e7e1a836-d601-4c2c-8d80-eb8967d224ee?path=5a9c2ee7-d61e-4383-8b08-ac0980e15595/0a857985-40c5-42f7-9691-31b1740cf7b2/%D1%87%D0%B8%D0%BF+%D0%B8+%D0%B4%D0%B5%D0%B8%CC%86%D0%BB.png", "date": "2026-07-21"}, {"name": "Singing buddy", "icon": "/global/edce6144-55f8-4a35-8b11-785db7e55277?path=58e5a364-2d77-4cd1-835d-26cad6b6e3e3/f4b5c3fe-64e4-46b3-b291-2ba91ee87536/IMG_20260727_110102_408.png", "date": "2026-07-28"}, {"name": "P2P power 💪🏼", "icon": "/global/e7e1a836-d601-4c2c-8d80-eb8967d224ee?path=5a9c2ee7-d61e-4383-8b08-ac0980e15595/0a857985-40c5-42f7-9691-31b1740cf7b2/%D1%87%D0%B8%D0%BF+%D0%B8+%D0%B4%D0%B5%D0%B8%CC%86%D0%BB.png", "date": "2026-07-28"}, {"name": "Attending a class hour", "icon": "/global/edce6144-55f8-4a35-8b11-785db7e55277?path=65c74819-16a7-4061-8e7d-e3469941973f/9ebb3e9b-da68-4565-a5d2-3d20e7cd0953/Event-2.png", "date": "2026-08-05"}, {"name": "Billionaire", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=92c0e92c-2814-4c97-bd2a-471797563df5/c79e3072-e183-42f0-8bdc-3ed307276911/Billionaire.png", "date": "2026-08-22"}, {"name": "Организатор квеста Space Unlocked 21", "icon": "/global/6c2a31f0-64be-4cc9-a086-ed73869a94db?path=2c0fd979-8d5a-4398-a0f9-9da25858b3e5/39838802-f898-4237-ab3d-55153ed5948a/%D0%9E%D1%80%D0%B3%D0%B0%D0%BD%D0%B8%D0%B7%D0%B0%D1%82%D0%BE%D1%80+%D0%BF%D0%BE%D1%81%D0%B2%D1%8F%D1%89%D0%B5%D0%BD%D0%B8%D1%8F+__+%D0%B2%D0%BE%D0%BB%D0%BD%D1%8B-2.png", "date": "2026-08-22"}, {"name": "Participant in a choir concert 🎶", "icon": "/global/6083d766-96c6-4d9d-847b-677f86e4e6bb?path=80020281-9fe3-4d1e-ba7b-f61b59d5700c/9a7b51c0-ef10-47af-b488-fe06e5b02aed/image+%289%29+%281%29-Photoroom.png", "date": "2026-08-27"}, {"name": "Honey Badgi Master", "icon": "/global/edce6144-55f8-4a35-8b11-785db7e55277?path=d8f87744-500c-45a1-8733-049c5685aba9/56b751be-9e13-401a-8d84-a1bc0fbef817/%D0%90%D1%87%D0%B8%D0%B2%D0%BA%D0%B0_%D0%BE%D1%80%D0%B8%D0%B3%D0%B0%D0%BC%D0%B8_%D0%BC%D0%B5%D0%B4%D0%BE%D0%B5%D0%B4.png", "date": "2026-09-30"}, {"name": "Mistakes are not for me", "icon": "/public_any/28b7cafe-b4c0-4931-9ee5-5afb322a2a00?path=30842fcd-1d46-4f83-b959-d31541b4f0d2/89a50afa-34c0-4ce9-871f-499ec856fc71/Mistakes+are+not+for+me.png", "date": "2026-09-30"}, {"name": "Salamanders. Offline mode", "icon": "/global/edce6144-55f8-4a35-8b11-785db7e55277?path=bcf9be16-1873-4e9e-9b29-33b1eb418a1a/6c437ac7-1af5-49ee-af85-726d64667c27/Salamanders.+Offline+mode.png", "date": "2026-09-30"}, {"name": "Организатор квеста Space Unlocked 21", "icon": "/global/6c2a31f0-64be-4cc9-a086-ed73869a94db?path=2c0fd979-8d5a-4398-a0f9-9da25858b3e5/39838802-f898-4237-ab3d-55153ed5948a/%D0%9E%D1%80%D0%B3%D0%B0%D0%BD%D0%B8%D0%B7%D0%B0%D1%82%D0%BE%D1%80+%D0%BF%D0%BE%D1%81%D0%B2%D1%8F%D1%89%D0%B5%D0%BD%D0%B8%D1%8F+__+%D0%B2%D0%BE%D0%BB%D0%BD%D1%8B-2.png", "date": "2026-10-13"}]}, "points": {"peerReviewPoints": 11, "codeReviewPoints": 5, "coins": 597}, "coalition": {"coalitionId": 156, "name": "Salamanders", "rank": 197}, "persona": "Night Shift Project Machine"}
+        </script>
+        <script>
+            (() => {
+                const S = JSON.parse(
+                    document.getElementById("story").textContent,
+                );
+                const reduced = matchMedia(
+                    "(prefers-reduced-motion: reduce)",
+                ).matches;
 
-  // ---------- helpers ----------
-  const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
-    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-  const fmtMonth = m => new Date(m + '-01T12:00').toLocaleDateString('en', { month: 'long', year: 'numeric' });
-  const shortMonth = m => new Date(m + '-01T12:00').toLocaleDateString('en', { month: 'short' }) + " '" + m.slice(2, 4);
-  const fmtDate = d => new Date(d.slice(0, 10) + 'T12:00').toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' });
-  const plural = (n, word, many) => `${n} ${n === 1 ? word : (many || word + 's')}`;
-  const hh = h => String(h).padStart(2, '0') + ':00';
-  const r = (i, cls = '') => `class="rise ${cls}" style="--i:${i}"`;
+                // ---------- helpers ----------
+                const esc = (s) =>
+                    String(s ?? "").replace(
+                        /[&<>"']/g,
+                        (c) =>
+                            ({
+                                "&": "&amp;",
+                                "<": "&lt;",
+                                ">": "&gt;",
+                                '"': "&quot;",
+                                "'": "&#39;",
+                            })[c],
+                    );
+                const fmtMonth = (m) =>
+                    new Date(m + "-01T12:00").toLocaleDateString("en", {
+                        month: "long",
+                        year: "numeric",
+                    });
+                const shortMonth = (m) =>
+                    new Date(m + "-01T12:00").toLocaleDateString("en", {
+                        month: "short",
+                    }) +
+                    " '" +
+                    m.slice(2, 4);
+                const fmtDate = (d) =>
+                    new Date(d.slice(0, 10) + "T12:00").toLocaleDateString(
+                        "en",
+                        { day: "numeric", month: "short", year: "numeric" },
+                    );
+                const plural = (n, word, many) =>
+                    `${n} ${n === 1 ? word : many || word + "s"}`;
+                const hh = (h) => String(h).padStart(2, "0") + ":00";
+                const r = (i, cls = "") =>
+                    `class="rise ${cls}" style="--i:${i}"`;
 
-  function barPath(x, y, w, h, rad) {
-    rad = Math.min(rad, w / 2, h);
-    return `M${x},${y + h}V${y + rad}Q${x},${y} ${x + rad},${y}H${x + w - rad}Q${x + w},${y} ${x + w},${y + rad}V${y + h}Z`;
-  }
+                function barPath(x, y, w, h, rad) {
+                    rad = Math.min(rad, w / 2, h);
+                    return `M${x},${y + h}V${y + rad}Q${x},${y} ${x + rad},${y}H${x + w - rad}Q${x + w},${y} ${x + w},${y + rad}V${y + h}Z`;
+                }
 
-  function barChart(values, { tips, hi, label }) {
-    const W = 600, H = 170, n = values.length, max = Math.max(1, ...values);
-    const step = W / n, gap = Math.min(Math.max(2, step * 0.18), 10), w = step - gap;
-    const cols = values.map((v, i) => {
-      const x = i * step + gap / 2, h = (v / max) * (H - 6);
-      const mark = v > 0
-        ? `<path class="bar${i === hi ? ' hi' : ''}" style="--d:${i * 22}ms" d="${barPath(x, H - h, w, h, 4)}"/>`
-        : `<rect class="stub" x="${x}" y="${H - 2}" width="${w}" height="2" rx="1"/>`;
-      return `<g class="col">${mark}<rect class="hit" x="${i * step}" y="0" width="${step}" height="${H}" data-tip="${esc(tips[i])}"/></g>`;
-    }).join('');
-    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}">` +
-      `<line class="base" x1="0" x2="${W}" y1="${H}" y2="${H}"/>${cols}</svg>`;
-  }
+                function barChart(values, { tips, hi, label }) {
+                    const W = 600,
+                        H = 170,
+                        n = values.length,
+                        max = Math.max(1, ...values);
+                    const step = W / n,
+                        gap = Math.min(Math.max(2, step * 0.18), 10),
+                        w = step - gap;
+                    const cols = values
+                        .map((v, i) => {
+                            const x = i * step + gap / 2,
+                                h = (v / max) * (H - 6);
+                            const mark =
+                                v > 0
+                                    ? `<path class="bar${i === hi ? " hi" : ""}" style="--d:${i * 22}ms" d="${barPath(x, H - h, w, h, 4)}"/>`
+                                    : `<rect class="stub" x="${x}" y="${H - 2}" width="${w}" height="2" rx="1"/>`;
+                            return `<g class="col">${mark}<rect class="hit" x="${i * step}" y="0" width="${step}" height="${H}" data-tip="${esc(tips[i])}"/></g>`;
+                        })
+                        .join("");
+                    return (
+                        `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}">` +
+                        `<line class="base" x1="0" x2="${W}" y1="${H}" y2="${H}"/>${cols}</svg>`
+                    );
+                }
 
-  function axis(n, marks) {
-    return `<div class="axis">${marks.map(([i, text]) =>
-      `<span style="left:${((i + 0.5) / n) * 100}%">${esc(text)}</span>`).join('')}</div>`;
-  }
+                function axis(n, marks) {
+                    return `<div class="axis">${marks
+                        .map(
+                            ([i, text]) =>
+                                `<span style="left:${((i + 0.5) / n) * 100}%">${esc(text)}</span>`,
+                        )
+                        .join("")}</div>`;
+                }
 
-  function lineChart(weeks, typical) {
-    const W = 600, H = 190, pad = 8, n = weeks.length;
-    const max = Math.max(1, ...weeks.map(w => w.hours));
-    const x = i => pad + (i * (W - 2 * pad)) / Math.max(1, n - 1);
-    const y = v => H - pad - (v / max) * (H - 2 * pad - 8);
-    const pts = weeks.map((w, i) => `${x(i).toFixed(1)},${y(w.hours).toFixed(1)}`);
-    const line = 'M' + pts.join('L');
-    const peak = weeks.reduce((b, w, i) => (w.hours > weeks[b].hours ? i : b), 0);
-    return `<svg class="line-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Weekly logtime average, ${n} weeks">` +
-      `<path class="area" d="${line}L${x(n - 1)},${H - pad}L${x(0)},${H - pad}Z"/>` +
-      `<line class="base" x1="0" x2="${W}" y1="${H - pad}" y2="${H - pad}"/>` +
-      `<line class="typical" x1="0" x2="${W}" y1="${y(typical)}" y2="${y(typical)}"/>` +
-      `<path class="line" pathLength="1" d="${line}"/>` +
-      `<circle class="peak" cx="${x(peak)}" cy="${y(weeks[peak].hours)}" r="6"/>` +
-      `<line class="cross" x1="0" x2="0" y1="0" y2="${H - pad}"/>` +
-      `<circle class="cursor" r="6" cx="0" cy="0"/>` +
-      `<rect class="overlay" width="${W}" height="${H}"/></svg>`;
-  }
+                function lineChart(weeks, typical) {
+                    const W = 600,
+                        H = 190,
+                        pad = 8,
+                        n = weeks.length;
+                    const max = Math.max(1, ...weeks.map((w) => w.hours));
+                    const x = (i) =>
+                        pad + (i * (W - 2 * pad)) / Math.max(1, n - 1);
+                    const y = (v) => H - pad - (v / max) * (H - 2 * pad - 8);
+                    const pts = weeks.map(
+                        (w, i) => `${x(i).toFixed(1)},${y(w.hours).toFixed(1)}`,
+                    );
+                    const line = "M" + pts.join("L");
+                    const peak = weeks.reduce(
+                        (b, w, i) => (w.hours > weeks[b].hours ? i : b),
+                        0,
+                    );
+                    return (
+                        `<svg class="line-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Weekly logtime average, ${n} weeks">` +
+                        `<path class="area" d="${line}L${x(n - 1)},${H - pad}L${x(0)},${H - pad}Z"/>` +
+                        `<line class="base" x1="0" x2="${W}" y1="${H - pad}" y2="${H - pad}"/>` +
+                        `<line class="typical" x1="0" x2="${W}" y1="${y(typical)}" y2="${y(typical)}"/>` +
+                        `<path class="line" pathLength="1" d="${line}"/>` +
+                        `<circle class="peak" cx="${x(peak)}" cy="${y(weeks[peak].hours)}" r="6"/>` +
+                        `<line class="cross" x1="0" x2="0" y1="0" y2="${H - pad}"/>` +
+                        `<circle class="cursor" r="6" cx="0" cy="0"/>` +
+                        `<rect class="overlay" width="${W}" height="${H}"/></svg>`
+                    );
+                }
 
-  function bindLineChart(root, weeks) {
-    const svg = root.querySelector('.line-chart');
-    if (!svg) return;
-    const W = 600, H = 190, pad = 8, n = weeks.length;
-    const max = Math.max(1, ...weeks.map(w => w.hours));
-    const cross = svg.querySelector('.cross'), cursor = svg.querySelector('.cursor');
-    svg.addEventListener('pointermove', e => {
-      const box = svg.getBoundingClientRect();
-      const fx = ((e.clientX - box.left) / box.width) * W;
-      const i = Math.max(0, Math.min(n - 1, Math.round(((fx - pad) / (W - 2 * pad)) * (n - 1))));
-      const cx = pad + (i * (W - 2 * pad)) / Math.max(1, n - 1);
-      const cy = H - pad - (weeks[i].hours / max) * (H - 2 * pad - 8);
-      cross.setAttribute('x1', cx); cross.setAttribute('x2', cx);
-      cursor.setAttribute('cx', cx); cursor.setAttribute('cy', cy);
-      showTip(`Week of ${fmtDate(weeks[i].week)}: ${weeks[i].hours.toFixed(1)}h`,
-        box.left + (cx / W) * box.width, box.top + (cy / H) * box.height);
-    });
-    svg.addEventListener('pointerleave', hideTip);
-  }
+                function bindLineChart(root, weeks) {
+                    const svg = root.querySelector(".line-chart");
+                    if (!svg) return;
+                    const W = 600,
+                        H = 190,
+                        pad = 8,
+                        n = weeks.length;
+                    const max = Math.max(1, ...weeks.map((w) => w.hours));
+                    const cross = svg.querySelector(".cross"),
+                        cursor = svg.querySelector(".cursor");
+                    svg.addEventListener("pointermove", (e) => {
+                        const box = svg.getBoundingClientRect();
+                        const fx = ((e.clientX - box.left) / box.width) * W;
+                        const i = Math.max(
+                            0,
+                            Math.min(
+                                n - 1,
+                                Math.round(
+                                    ((fx - pad) / (W - 2 * pad)) * (n - 1),
+                                ),
+                            ),
+                        );
+                        const cx =
+                            pad + (i * (W - 2 * pad)) / Math.max(1, n - 1);
+                        const cy =
+                            H -
+                            pad -
+                            (weeks[i].hours / max) * (H - 2 * pad - 8);
+                        cross.setAttribute("x1", cx);
+                        cross.setAttribute("x2", cx);
+                        cursor.setAttribute("cx", cx);
+                        cursor.setAttribute("cy", cy);
+                        showTip(
+                            `Week of ${fmtDate(weeks[i].week)}: ${weeks[i].hours.toFixed(1)}h`,
+                            box.left + (cx / W) * box.width,
+                            box.top + (cy / H) * box.height,
+                        );
+                    });
+                    svg.addEventListener("pointerleave", hideTip);
+                }
 
-  function hbars(rows, scale, fmt) {
-    return `<div class="hrows">${rows.map(row => `
+                function hbars(rows, scale, fmt) {
+                    return `<div class="hrows">${rows
+                        .map(
+                            (row) => `
       <div class="hrow" data-tip="${esc(row.label)}: ${esc(fmt(row.value))}">
         <span class="hlabel">${esc(row.label)}</span>
         <div class="htrack"><div class="hbar" style="--w:${Math.max(2, (row.value / scale) * 100)}%"></div></div>
         <span class="hval">${esc(fmt(row.value))}</span>
-      </div>`).join('')}</div>`;
-  }
+      </div>`,
+                        )
+                        .join("")}</div>`;
+                }
 
-  function dotStrip(scores) {
-    const counts = {};
-    scores.forEach(s => { counts[s] = (counts[s] || 0) + 1; });
-    return `<div class="dots" role="img" aria-label="Grade distribution">${Object.keys(counts).map(Number)
-      .sort((a, b) => a - b).map(s => `
-      <div class="dcol${s > 100 ? ' hi' : ''}" data-tip="${s}%: ${plural(counts[s], 'project')}">
-        <div class="dstack">${'<i></i>'.repeat(counts[s])}</div><span>${s}</span>
-      </div>`).join('')}</div>`;
-  }
+                function dotStrip(scores) {
+                    const counts = {};
+                    scores.forEach((s) => {
+                        counts[s] = (counts[s] || 0) + 1;
+                    });
+                    return `<div class="dots" role="img" aria-label="Grade distribution">${Object.keys(
+                        counts,
+                    )
+                        .map(Number)
+                        .sort((a, b) => a - b)
+                        .map(
+                            (s) => `
+      <div class="dcol${s > 100 ? " hi" : ""}" data-tip="${s}%: ${plural(counts[s], "project")}">
+        <div class="dstack">${"<i></i>".repeat(counts[s])}</div><span>${s}</span>
+      </div>`,
+                        )
+                        .join("")}</div>`;
+                }
 
-  // ---------- slides ----------
-  const THEMES = {
-    plum:   ['#1d0f3a', '#f6f0ff', '#ff5fa2'],
-    forest: ['#06372a', '#e9fff4', '#53f2a5'],
-    ink:    ['#0c1530', '#eaf1ff', '#6cc6ff'],
-    tang:   ['#ff6a2b', '#1c0800', '#2a0a5e'],
-    lemon:  ['#f4e04d', '#1a1600', '#5b2bff'],
-    night:  ['#08080f', '#eeeeff', '#a78bfa'],
-    rose:   ['#3a0a2e', '#ffeefa', '#ff8ad6'],
-    mint:   ['#c8f5e2', '#05241a', '#0a7a52'],
-    coral:  ['#ff5d6c', '#22040a', '#2b0030'],
-  };
-  const INTROS = [
-    "Your peers reviewed your code. Now it's your turn to get reviewed.",
-    "Segfaults forgiven. Let's see what actually compiled.",
-    "Valgrind found zero leaks in this recap. Probably.",
-    "Sit down, take a seat in the cluster. This one's about you.",
-    "Norminette passed. clang-format passed. Let's see if you did.",
-    "Grab a coffee from the kitchen, this takes a few taps.",
-  ];
-  const slides = [];
-  const add = (theme, label, html, mount) => slides.push({ theme, label, html, mount });
-  const P = S.participant || {};
-  const pr = S.projects;
-  const T = S.timeline, G = S.grades, C = S.clock, Q = S.squad;
-  const K = S.courses, M = S.map, L = S.logtime, F = S.feedback, SK = S.skills, B = S.badges;
+                // ---------- slides ----------
+                const THEMES = {
+                    plum: ["#1d0f3a", "#f6f0ff", "#ff5fa2"],
+                    forest: ["#06372a", "#e9fff4", "#53f2a5"],
+                    ink: ["#0c1530", "#eaf1ff", "#6cc6ff"],
+                    tang: ["#ff6a2b", "#1c0800", "#2a0a5e"],
+                    lemon: ["#f4e04d", "#1a1600", "#5b2bff"],
+                    night: ["#08080f", "#eeeeff", "#a78bfa"],
+                    rose: ["#3a0a2e", "#ffeefa", "#ff8ad6"],
+                    mint: ["#c8f5e2", "#05241a", "#0a7a52"],
+                    coral: ["#ff5d6c", "#22040a", "#2b0030"],
+                };
+                const INTROS = [
+                    "Your peers reviewed your code. Now it's your turn to get reviewed.",
+                    "Segfaults forgiven. Let's see what actually compiled.",
+                    "Valgrind found zero leaks in this recap. Probably.",
+                    "Sit down, take a seat in the cluster. This one's about you.",
+                    "Verter passed. clang-format passed. Let's see if you did.",
+                    "Grab a coffee from the kitchen, this takes a few taps.",
+                ];
+                const slides = [];
+                const add = (theme, label, html, mount) =>
+                    slides.push({ theme, label, html, mount });
+                const P = S.participant || {};
+                const pr = S.projects;
+                const T = S.timeline,
+                    G = S.grades,
+                    C = S.clock,
+                    Q = S.squad;
+                const K = S.courses,
+                    M = S.map,
+                    L = S.logtime,
+                    F = S.feedback,
+                    SK = S.skills,
+                    B = S.badges;
 
-  add('plum', 'Intro', `
-    <p ${r(0, 'kicker')}>School 21 · Wrapped</p>
-    <h1 ${r(1, 'big')}>Hey, <span class="accent">${esc(S.login)}</span>.</h1>
-    <p ${r(2, 'lede')}>${[P.className, P.parallelName, P.campus && P.campus.shortName].filter(Boolean).map(esc).join(' · ')}</p>
-    <p ${r(3, 'lede')}>${esc(INTROS[Math.floor(Math.random() * INTROS.length)])}</p>
-    <p ${r(4, 'hint')}>tap, click or press → to start</p>`);
+                add(
+                    "plum",
+                    "Intro",
+                    `
+    <p ${r(0, "kicker")}>School 21 · Wrapped</p>
+    <h1 ${r(1, "big")}>Hey, <span class="accent">${esc(S.login)}</span>.</h1>
+    <p ${r(2, "lede")}>${[P.className, P.parallelName, P.campus && P.campus.shortName].filter(Boolean).map(esc).join(" · ")}</p>
+    <p ${r(3, "lede")}>${esc(INTROS[Math.floor(Math.random() * INTROS.length)])}</p>
+    <p ${r(4, "hint")}>tap, click or press → to start</p>`,
+                );
 
-  {
-    const names = { INDIVIDUAL: 'solo', GROUP: 'group', EXAM: 'exams', EXAM_TEST: 'exam tests', INTERNSHIP: 'internships' };
-    const n = pr.done;
-    const quip = n === 0 ? 'Everyone starts at zero. The Piscine was day one for all of us.'
-      : n < 5 ? 'A warm-up lap. The cluster is just getting to know you.'
-      : n < 15 ? "That's a respectable stack of ACCEPTED."
-      : n < 30 ? 'Reviewers know your login by heart now.'
-      : "At this point you're part of the curriculum.";
-    add('forest', 'Projects passed', `
-      <p ${r(0, 'kicker')}>Projects passed</p>
-      <div ${r(1, 'huge accent')} data-count="${n}">${n}</div>
-      <p ${r(2, 'lede')}>${quip}</p>
-      <div ${r(3, 'chips')}>${Object.entries(pr.byType).map(([t, c]) =>
-        `<span class="chip">${c} ${esc(names[t] || t.toLowerCase())}</span>`).join('')}</div>`);
-  }
+                {
+                    const names = {
+                        INDIVIDUAL: "solo",
+                        GROUP: "group",
+                        EXAM: "exams",
+                        EXAM_TEST: "exam tests",
+                        INTERNSHIP: "internships",
+                    };
+                    const n = pr.done;
+                    const quip =
+                        n === 0
+                            ? "Everyone starts at zero. The Piscine was day one for all of us."
+                            : n < 5
+                              ? "A warm-up lap. The cluster is just getting to know you."
+                              : n < 15
+                                ? "That's a respectable stack of ACCEPTED."
+                                : n < 30
+                                  ? "Reviewers know your login by heart now."
+                                  : "At this point you're part of the curriculum.";
+                    add(
+                        "forest",
+                        "Projects passed",
+                        `
+      <p ${r(0, "kicker")}>Projects passed</p>
+      <div ${r(1, "huge accent")} data-count="${n}">${n}</div>
+      <p ${r(2, "lede")}>${quip}</p>
+      <div ${r(3, "chips")}>${Object.entries(pr.byType)
+          .map(
+              ([t, c]) =>
+                  `<span class="chip">${c} ${esc(names[t] || t.toLowerCase())}</span>`,
+          )
+          .join("")}</div>`,
+                    );
+                }
 
-  if (T) {
-    const counts = T.months.map(m => m.count);
-    const hi = T.months.findIndex(m => m.month === T.peakMonth.month);
-    const ties = counts.filter(c => c === T.peakMonth.count).length;
-    const n = T.months.length;
-    const marks = n > 2 ? [[0, shortMonth(T.months[0].month)], [Math.floor(n / 2), shortMonth(T.months[Math.floor(n / 2)].month)], [n - 1, shortMonth(T.months[n - 1].month)]]
-      : T.months.map((m, i) => [i, shortMonth(m.month)]);
-    add('ink', 'Busiest month', `
-      <p ${r(0, 'kicker')}>Your busiest month</p>
-      <h2 ${r(1, 'big accent')}>${fmtMonth(T.peakMonth.month)}</h2>
-      <p ${r(2, 'lede')}>${plural(T.peakMonth.count, 'project')} passed in one month${ties > 1 ? ` (and you matched it ${plural(ties - 1, 'more time')})` : ''}. Something was in the water.</p>
-      <figure ${r(3, 'chart')} data-noadvance>
-        ${barChart(counts, { hi, label: 'Projects passed per month', tips: T.months.map(m => `${fmtMonth(m.month)}: ${plural(m.count, 'project')}`) })}
+                if (T) {
+                    const counts = T.months.map((m) => m.count);
+                    const hi = T.months.findIndex(
+                        (m) => m.month === T.peakMonth.month,
+                    );
+                    const ties = counts.filter(
+                        (c) => c === T.peakMonth.count,
+                    ).length;
+                    const n = T.months.length;
+                    const marks =
+                        n > 2
+                            ? [
+                                  [0, shortMonth(T.months[0].month)],
+                                  [
+                                      Math.floor(n / 2),
+                                      shortMonth(
+                                          T.months[Math.floor(n / 2)].month,
+                                      ),
+                                  ],
+                                  [n - 1, shortMonth(T.months[n - 1].month)],
+                              ]
+                            : T.months.map((m, i) => [i, shortMonth(m.month)]);
+                    add(
+                        "ink",
+                        "Busiest month",
+                        `
+      <p ${r(0, "kicker")}>Your busiest month</p>
+      <h2 ${r(1, "big accent")}>${fmtMonth(T.peakMonth.month)}</h2>
+      <p ${r(2, "lede")}>${plural(T.peakMonth.count, "project")} passed in one month${ties > 1 ? ` (and you matched it ${plural(ties - 1, "more time")})` : ""}. Something was in the water.</p>
+      <figure ${r(3, "chart")} data-noadvance>
+        ${barChart(counts, { hi, label: "Projects passed per month", tips: T.months.map((m) => `${fmtMonth(m.month)}: ${plural(m.count, "project")}`) })}
         ${axis(n, marks)}
-      </figure>`);
+      </figure>`,
+                    );
 
-    const facts = [];
-    if (T.rushWeek.count >= 2) facts.push(`<div class="fact"><p class="kicker">Speedrun week</p>
+                    const facts = [];
+                    if (T.rushWeek.count >= 2)
+                        facts.push(`<div class="fact"><p class="kicker">Speedrun week</p>
       <p class="mid"><span class="accent">${T.rushWeek.count} projects</span> in 7 days</p>
       <p class="note">starting ${fmtDate(T.rushWeek.from)}. Did you sleep?</p></div>`);
-    if (T.drought && T.drought.days >= 14) facts.push(`<div class="fact"><p class="kicker">The great drought</p>
+                    if (T.drought && T.drought.days >= 14)
+                        facts.push(`<div class="fact"><p class="kicker">The great drought</p>
       <p class="mid"><span class="accent">${T.drought.days} days</span> without a pass</p>
       <p class="note">after ${fmtDate(T.drought.from)}, until ${esc(T.drought.brokenBy)} broke the curse.</p></div>`);
-    facts.push(`<div class="fact"><p class="kicker">Where it started</p>
+                    facts.push(`<div class="fact"><p class="kicker">Where it started</p>
       <p class="mid">${esc(T.first.title)}</p>
       <p class="note">${fmtDate(T.first.date)}. Most recent: ${esc(T.latest.title)}, ${fmtDate(T.latest.date)}.</p></div>`);
-    add('coral', 'Highs and lows', `
-      <p ${r(0, 'kicker')}>Highs and lows</p>
-      <div class="facts">${facts.map((f, i) => f.replace('class="fact"', r(i + 1, 'fact'))).join('')}</div>`);
-  }
+                    add(
+                        "coral",
+                        "Highs and lows",
+                        `
+      <p ${r(0, "kicker")}>Highs and lows</p>
+      <div class="facts">${facts.map((f, i) => f.replace('class="fact"', r(i + 1, "fact"))).join("")}</div>`,
+                    );
+                }
 
-  if (G) {
-    const over = G.over100 > 0
-      ? `You went past 100% <b>${plural(G.over100, 'time')}</b>. Bonus-part enjoyer.`
-      : G.exactly100 > 0 ? `${plural(G.exactly100, 'clean 100')}. No more, no less. Efficient.` : 'A pass is a pass.';
-    add('lemon', 'Grades', `
-      <p ${r(0, 'kicker')}>Average grade</p>
-      <div ${r(1, 'huge accent')}><span data-count="${G.average}">${G.average}</span><span class="unit">%</span></div>
-      <p ${r(2, 'lede')}>${over}</p>
-      <figure ${r(3, 'chart')} data-noadvance>${dotStrip(G.scores)}</figure>
-      <div ${r(4, 'tiles')}>
+                if (G) {
+                    const over =
+                        G.over100 > 0
+                            ? `You went past 100% <b>${plural(G.over100, "time")}</b>. Bonus-part enjoyer.`
+                            : G.exactly100 > 0
+                              ? `${plural(G.exactly100, "clean 100")}. No more, no less. Efficient.`
+                              : "A pass is a pass.";
+                    add(
+                        "lemon",
+                        "Grades",
+                        `
+      <p ${r(0, "kicker")}>Average grade</p>
+      <div ${r(1, "huge accent")}><span data-count="${G.average}">${G.average}</span><span class="unit">%</span></div>
+      <p ${r(2, "lede")}>${over}</p>
+      <figure ${r(3, "chart")} data-noadvance>${dotStrip(G.scores)}</figure>
+      <div ${r(4, "tiles")}>
         <div class="tile"><p class="kicker">Best</p><p class="mid">${G.best.score}%</p><p class="note">${esc(G.best.title)}</p></div>
         <div class="tile"><p class="kicker">Closest call</p><p class="mid">${G.closest.score}%</p><p class="note">${esc(G.closest.title)}</p></div>
-      </div>`);
-  }
+      </div>`,
+                    );
+                }
 
-  if (pr.active + pr.failed > 0) {
-    const blocks = [];
-    if (pr.active) blocks.push(`<div ${r(2, 'fact')}><p class="kicker">In the oven</p>
-      <div class="chips" style="margin-top:8px">${pr.activeTitles.map(t => `<span class="chip">${esc(t)}</span>`).join('')}</div></div>`);
-    if (pr.failed) blocks.push(`<div ${r(3, 'fact')}><p class="kicker">Unfinished business</p>
-      <div class="chips" style="margin-top:8px">${pr.failedTitles.map(t => `<span class="chip solid">✗ ${esc(t)}</span>`).join('')}</div>
+                if (pr.active + pr.failed > 0) {
+                    const blocks = [];
+                    if (pr.active)
+                        blocks.push(`<div ${r(2, "fact")}><p class="kicker">In the oven</p>
+      <div class="chips" style="margin-top:8px">${pr.activeTitles.map((t) => `<span class="chip">${esc(t)}</span>`).join("")}</div></div>`);
+                    if (pr.failed)
+                        blocks.push(`<div ${r(3, "fact")}><p class="kicker">Unfinished business</p>
+      <div class="chips" style="margin-top:8px">${pr.failedTitles.map((t) => `<span class="chip solid">✗ ${esc(t)}</span>`).join("")}</div>
       <p class="note" style="margin-top:8px">Every FAILED is just a retry with extra lore.</p></div>`);
-    add('tang', 'Still cooking', `
-      <p ${r(0, 'kicker')}>Still cooking</p>
-      <h2 ${r(1, 'big')}>${pr.active ? plural(pr.active, 'project') + ' on the stove' : 'Some scores to settle'}</h2>
-      ${blocks.join('')}`);
-  }
+                    add(
+                        "tang",
+                        "Still cooking",
+                        `
+      <p ${r(0, "kicker")}>Still cooking</p>
+      <h2 ${r(1, "big")}>${pr.active ? plural(pr.active, "project") + " on the stove" : "Some scores to settle"}</h2>
+      ${blocks.join("")}`,
+                    );
+                }
 
-  if (C) {
-    const P2 = {
-      night: ['Night owl', 'Most of your projects wrapped up after dark. The cluster lights stay on for you.'],
-      morning: ['Early bird', 'You close things out before most people finish breakfast.'],
-      day: ['Daylight hours', 'Respectable hours. Your sleep schedule thanks you.'],
-    }[C.persona];
-    if (C.persona === 'day' && (C.peakHour >= 22 || C.peakHour <= 4)) {
-      P2[1] = "Mostly respectable hours, but your record hour is the middle of the night. We won't ask.";
-    }
-    const favDay = C.weekdays.reduce((a, b) => (b.count > a.count ? b : a));
-    add('night', 'Clock', `
-      <p ${r(0, 'kicker')}>When your projects crossed the finish line</p>
-      <h2 ${r(1, 'big accent')}>${P2[0]}</h2>
-      <p ${r(2, 'lede')}>${P2[1]} Peak hour: <b>${hh(C.peakHour)}</b>. Favourite day: <b>${favDay.day}</b>.</p>
-      <figure ${r(3, 'chart')} data-noadvance>
-        ${barChart(C.hours, { hi: C.peakHour, label: 'Projects completed by hour of day', tips: C.hours.map((c, h) => `${hh(h)}–${hh((h + 1) % 24)}: ${plural(c, 'project')}`) })}
-        ${axis(24, [[0, '00:00'], [6, '06:00'], [12, '12:00'], [18, '18:00'], [23, '23:00']])}
+                if (C) {
+                    const P2 = {
+                        night: [
+                            "Night owl",
+                            "Most of your projects wrapped up after dark. The cluster lights stay on for you.",
+                        ],
+                        morning: [
+                            "Early bird",
+                            "You close things out before most people finish breakfast.",
+                        ],
+                        day: [
+                            "Daylight hours",
+                            "Respectable hours. Your sleep schedule thanks you.",
+                        ],
+                    }[C.persona];
+                    if (
+                        C.persona === "day" &&
+                        (C.peakHour >= 22 || C.peakHour <= 4)
+                    ) {
+                        P2[1] =
+                            "Mostly respectable hours, but your record hour is the middle of the night. We won't ask.";
+                    }
+                    const favDay = C.weekdays.reduce((a, b) =>
+                        b.count > a.count ? b : a,
+                    );
+                    add(
+                        "night",
+                        "Clock",
+                        `
+      <p ${r(0, "kicker")}>When your projects crossed the finish line</p>
+      <h2 ${r(1, "big accent")}>${P2[0]}</h2>
+      <p ${r(2, "lede")}>${P2[1]} Peak hour: <b>${hh(C.peakHour)}</b>. Favourite day: <b>${favDay.day}</b>.</p>
+      <figure ${r(3, "chart")} data-noadvance>
+        ${barChart(C.hours, { hi: C.peakHour, label: "Projects completed by hour of day", tips: C.hours.map((c, h) => `${hh(h)}–${hh((h + 1) % 24)}: ${plural(c, "project")}`) })}
+        ${axis(24, [
+            [0, "00:00"],
+            [6, "06:00"],
+            [12, "12:00"],
+            [18, "18:00"],
+            [23, "23:00"],
+        ])}
       </figure>
-      <p ${r(4, 'note')}>Based on when each project was marked complete, in your local time.</p>`);
-  }
+      <p ${r(4, "note")}>Based on when each project was marked complete, in your local time.</p>`,
+                    );
+                }
 
-  if (Q) {
-    const top = Q.mates[0];
-    const line = top.count >= 3 ? "That's basically a marriage at this point." : 'A partnership forged in merge conflicts.';
-    add('rose', 'Squad', `
-      <p ${r(0, 'kicker')}>Your ride-or-die</p>
-      <h2 ${r(1, 'big accent')}>${esc(top.login)}</h2>
-      <p ${r(2, 'lede')}>${plural(top.count, 'project')} together. ${line}</p>
-      <div ${r(3, 'people')}>${Q.mates.map(p => `<div class="person"><span class="avatar">${esc(p.login.slice(0, 2).toUpperCase())}</span>
-        ${esc(p.login)}<small>${plural(p.count, 'project')}</small></div>`).join('')}</div>
-      <p ${r(4, 'note')}>${plural(Q.uniqueMates, 'different teammate')} across ${plural(Q.groupProjects, 'group project')}. You were teamlead ${plural(Q.teamlead, 'time')}.</p>`);
-  }
+                if (Q) {
+                    const top = Q.mates[0];
+                    const line =
+                        top.count >= 3
+                            ? "That's basically a marriage at this point."
+                            : "A partnership forged in merge conflicts.";
+                    add(
+                        "rose",
+                        "Squad",
+                        `
+      <p ${r(0, "kicker")}>Your ride-or-die</p>
+      <h2 ${r(1, "big accent")}>${esc(top.login)}</h2>
+      <p ${r(2, "lede")}>${plural(top.count, "project")} together. ${line}</p>
+      <div ${r(3, "people")}>${Q.mates
+          .map(
+              (
+                  p,
+              ) => `<div class="person"><span class="avatar">${esc(p.login.slice(0, 2).toUpperCase())}</span>
+        ${esc(p.login)}<small>${plural(p.count, "project")}</small></div>`,
+          )
+          .join("")}</div>
+      <p ${r(4, "note")}>${plural(Q.uniqueMates, "different teammate")} across ${plural(Q.groupProjects, "group project")}. You were teamlead ${plural(Q.teamlead, "time")}.</p>`,
+                    );
+                }
 
-  if (K && K.total) {
-    const label = { ACCEPTED: 'cleared', IN_PROGRESS: 'in progress', REGISTERED: 'registered', ASSIGNED: 'assigned', FAILED: 'failed' };
-    const rows = K.list.slice(0, 7);
-    add('mint', 'Courses', `
-      <p ${r(0, 'kicker')}>Course clusters</p>
-      <h2 ${r(1, 'big')}><span class="accent">${K.done}</span> of ${K.total} cleared</h2>
-      <div ${r(2, 'courses')}>${rows.map(c => `
+                if (K && K.total) {
+                    const label = {
+                        ACCEPTED: "cleared",
+                        IN_PROGRESS: "in progress",
+                        REGISTERED: "registered",
+                        ASSIGNED: "assigned",
+                        FAILED: "failed",
+                    };
+                    const rows = K.list.slice(0, 7);
+                    add(
+                        "mint",
+                        "Courses",
+                        `
+      <p ${r(0, "kicker")}>Course clusters</p>
+      <h2 ${r(1, "big")}><span class="accent">${K.done}</span> of ${K.total} cleared</h2>
+      <div ${r(2, "courses")}>${rows
+          .map(
+              (c) => `
         <div class="course">
           <div class="course-top"><span>${esc(c.title)}</span>
-            <span class="pill${c.status === 'ACCEPTED' ? ' ok' : ''}">${esc(label[c.status] || c.status)}</span></div>
-          ${c.projectsSeen ? `<p>${c.projectsDone}/${c.projectsSeen} passed · ${c.projects.slice(0, 6).map(esc).join(', ')}${c.projects.length > 6 ? '…' : ''}</p>` : ''}
-        </div>`).join('')}</div>
-      ${K.list.length > rows.length ? `<p class="note">+${K.list.length - rows.length} more</p>` : ''}`);
-  }
+            <span class="pill${c.status === "ACCEPTED" ? " ok" : ""}">${esc(label[c.status] || c.status)}</span></div>
+          ${c.projectsSeen ? `<p>${c.projectsDone}/${c.projectsSeen} passed · ${c.projects.slice(0, 6).map(esc).join(", ")}${c.projects.length > 6 ? "…" : ""}</p>` : ""}
+        </div>`,
+          )
+          .join("")}</div>
+      ${K.list.length > rows.length ? `<p class="note">+${K.list.length - rows.length} more</p>` : ""}`,
+                    );
+                }
 
-  if (M && M.itemsTotal) {
-    const shown = M.branches.slice(0, 12);
-    let d = 0;
-    add('plum', 'Map', `
-      <p ${r(0, 'kicker')}>The project map</p>
-      <div ${r(1, 'huge accent')}><span data-count="${M.percent}">${M.percent}</span><span class="unit">%</span></div>
-      <p ${r(2, 'lede')}>of the map explored${M.percent < 10 ? ". It covers every track, so there's plenty of fog left" : ''}. ${M.itemsDone} of ${M.itemsTotal} nodes lit up${M.branchesCleared.length ? `, and you fully cleared <b>${M.branchesCleared.slice(0, 4).map(esc).join(', ')}</b>${M.branchesCleared.length > 4 ? ' and more' : ''}` : ''}.</p>
-      <div ${r(3, 'grid')} data-noadvance>${shown.map(b => `
-        <div class="branch${b.done === b.total ? ' clear' : ''}" data-tip="${esc(b.label)}: ${b.done}/${b.total}">
-          <b>${esc(b.label)}</b>
-          <div class="cells">${Array.from({ length: b.total }, (_, i) => `<i class="${i < b.done ? 'on' : ''}" style="--d:${(d++) * 18}ms"></i>`).join('')}</div>
-        </div>`).join('')}</div>
-      ${M.branches.length > shown.length ? `<p class="note">+${M.branches.length - shown.length} more branches</p>` : ''}`);
-  }
+                if (M) {
+                    const shown = M.branches.slice(0, 12);
+                    const state = {
+                        done: "passed",
+                        active: "in progress",
+                        todo: "not yet",
+                    };
+                    const cleared = M.branchesCleared.length
+                        ? `Fully cleared: <b>${M.branchesCleared.slice(0, 4).map(esc).join(", ")}</b>${M.branchesCleared.length > 4 ? " and more" : ""}.`
+                        : "No branch fully cleared yet. Getting there.";
+                    let d = 0;
+                    add(
+                        "plum",
+                        "Map",
+                        `
+      <p ${r(0, "kicker")}>The project map</p>
+      <div ${r(1, "huge accent")} data-count="${M.done}">${M.done}</div>
+      <p ${r(2, "lede")}>projects lit up across ${plural(M.branches.length, "branch", "branches")}. ${cleared}${M.active ? ` ${M.active} more in progress.` : ""}</p>
+      <div ${r(3, "grid")} data-noadvance>${shown
+          .map(
+              (b) => `
+        <div class="branch${b.done === b.total ? " clear" : ""}">
+          <b title="${esc(b.label)}"><span>${esc(b.label)}</span><small>${b.done}/${b.total}</small></b>
+          <div class="cells">${b.cells.map((c) => `<i class="${c.state === "done" ? "on" : c.state === "active" ? "wip" : ""}" style="--d:${d++ * 18}ms" data-tip="${esc(c.title)} · ${state[c.state]}"></i>`).join("")}</div>
+        </div>`,
+          )
+          .join("")}</div>
+      <p ${r(4, "note")}>${M.branches.length > shown.length ? `+${M.branches.length - shown.length} more branches · ` : ""}Courses are opened up into their projects. Filled = passed, outlined = in progress. Hover a block for its name.</p>`,
+                    );
+                }
 
-  if (L) {
-    const ratio = L.peakRatio && L.peakRatio >= 1.2 ? `, ${L.peakRatio}× your usual` : '';
-    add('ink', 'Logtime', `
-      <p ${r(0, 'kicker')}>Time on campus</p>
-      <h2 ${r(1, 'big')}>Typical week: <span class="accent">${L.typical}h</span></h2>
-      <p ${r(2, 'lede')}>Your most-campus week was the week of <b>${fmtDate(L.peak.week)}</b> at ${L.peak.hours.toFixed(1)}h${ratio}.</p>
-      <figure ${r(3, 'chart')} data-noadvance>${lineChart(L.weeks, L.typical)}
-        ${axis(L.weeks.length, [[0, fmtDate(L.weeks[0].week)], [L.weeks.length - 1, fmtDate(L.weeks[L.weeks.length - 1].week)]])}
+                if (L) {
+                    const ratio =
+                        L.peakRatio && L.peakRatio >= 1.2
+                            ? `, ${L.peakRatio}× your usual`
+                            : "";
+                    add(
+                        "ink",
+                        "Logtime",
+                        `
+      <p ${r(0, "kicker")}>Time on campus</p>
+      <h2 ${r(1, "big")}>Typical week: <span class="accent">${L.typical}h</span></h2>
+      <p ${r(2, "lede")}>Your most-campus week was the week of <b>${fmtDate(L.peak.week)}</b> at ${L.peak.hours.toFixed(1)}h${ratio}.</p>
+      <figure ${r(3, "chart")} data-noadvance>${lineChart(L.weeks, L.typical)}
+        ${axis(L.weeks.length, [
+            [0, fmtDate(L.weeks[0].week)],
+            [L.weeks.length - 1, fmtDate(L.weeks[L.weeks.length - 1].week)],
+        ])}
       </figure>
-      <p ${r(4, 'note')}>On campus ${L.activeWeeks} of ${L.totalWeeks} weeks · longest break ${plural(L.longestBreak, 'week')} · dashed line is your typical week · values are the platform's weekly logtime average.</p>`,
-      el => bindLineChart(el, L.weeks));
-  }
+      <p ${r(4, "note")}>On campus ${L.activeWeeks} of ${L.totalWeeks} weeks · longest break ${plural(L.longestBreak, "week")} · dashed line is your typical week · values are the platform's weekly logtime average.</p>`,
+                        (el) => bindLineChart(el, L.weeks),
+                    );
+                }
 
-  if (F) {
-    add('forest', 'Feedback', `
-      <p ${r(0, 'kicker')}>Your peers' verdict</p>
-      <p ${r(1, 'lede')}>After your reviews, people describe you as…</p>
-      <h2 ${r(2, 'big accent')}>${esc(F.title)}</h2>
-      <div ${r(3)} data-noadvance>${hbars([...F.rows].sort((a, b) => b.value - a.value), F.scale, v => v.toFixed(1))}</div>`);
-  }
+                if (F) {
+                    add(
+                        "forest",
+                        "Feedback",
+                        `
+      <p ${r(0, "kicker")}>Your peers' verdict</p>
+      <p ${r(1, "lede")}>After your reviews, people describe you as…</p>
+      <h2 ${r(2, "big accent")}>${esc(F.title)}</h2>
+      <div ${r(3)} data-noadvance>${hbars(
+          [...F.rows].sort((a, b) => b.value - a.value),
+          F.scale,
+          (v) => v.toFixed(1),
+      )}</div>`,
+                    );
+                }
 
-  if (SK && SK.top.length) {
-    const scale = SK.top[0].points || 1;
-    add('night', 'Skills', `
-      <p ${r(0, 'kicker')}>Your strongest skill</p>
-      <h2 ${r(1, 'big accent')}>${esc(SK.top[0].name)}</h2>
-      <div ${r(2)} data-noadvance>${hbars(SK.top.map(s => ({ label: s.name, value: s.points })), scale, v => String(v))}</div>
-      <p ${r(3, 'note')}>Top ${SK.top.length} of ${plural(SK.count, 'skill')}, by skill points.</p>`);
-  }
+                if (SK && SK.top.length) {
+                    const scale = SK.top[0].points || 1;
+                    add(
+                        "night",
+                        "Skills",
+                        `
+      <p ${r(0, "kicker")}>Your strongest skill</p>
+      <h2 ${r(1, "big accent")}>${esc(SK.top[0].name)}</h2>
+      <div ${r(2)} data-noadvance>${hbars(
+          SK.top.map((s) => ({ label: s.name, value: s.points })),
+          scale,
+          (v) => String(v),
+      )}</div>
+      <p ${r(3, "note")}>Top ${SK.top.length} of ${plural(SK.count, "skill")}, by skill points.</p>`,
+                    );
+                }
 
-  {
-    const pts = S.points || {}, co = S.coalition;
-    const tiles = [];
-    if (pts.coins != null) tiles.push(['Coins', pts.coins]);
-    if (pts.peerReviewPoints != null) tiles.push(['Peer review pts', pts.peerReviewPoints]);
-    if (pts.codeReviewPoints != null) tiles.push(['Code review pts', pts.codeReviewPoints]);
-    if (co) tiles.push([co.name, co.rank != null ? '#' + co.rank : '—']);
-    if (tiles.length || B) {
-      const badges = B ? B.list.slice(-12).map(b => `<div class="badge" data-tip="${esc(b.name)}${b.date ? ' · ' + fmtDate(b.date) : ''}">${b.icon
-        ? `<img src="${esc(b.icon)}" alt="${esc(b.name)}" referrerpolicy="no-referrer" onerror="this.replaceWith(document.createTextNode('${esc(b.name.slice(0, 1).toUpperCase())}'))">`
-        : esc(b.name.slice(0, 1).toUpperCase())}</div>`).join('') : '';
-      add('lemon', 'Loot', `
-        <p ${r(0, 'kicker')}>The loot</p>
-        <h2 ${r(1, 'big')}>${B ? `<span class="accent">${plural(B.count, 'badge')}</span>` : 'Your stash'}</h2>
-        ${B ? `<div ${r(2, 'badges')} data-noadvance>${badges}</div>` : ''}
-        <div ${r(3, 'tiles')}>${tiles.map(([k, v]) => `<div class="tile"><p class="kicker">${esc(k)}</p><p class="mid">${esc(v)}</p></div>`).join('')}</div>
-        ${co ? `<p ${r(4, 'note')}>Coalition rank shown next to ${esc(co.name)}.</p>` : ''}`);
-    }
-  }
+                {
+                    const pts = S.points || {},
+                        co = S.coalition;
+                    const tiles = [];
+                    if (pts.coins != null) tiles.push(["Coins", pts.coins]);
+                    if (pts.peerReviewPoints != null)
+                        tiles.push(["Peer review pts", pts.peerReviewPoints]);
+                    if (pts.codeReviewPoints != null)
+                        tiles.push(["Code review pts", pts.codeReviewPoints]);
+                    if (co)
+                        tiles.push([
+                            co.name,
+                            co.rank != null ? "#" + co.rank : "—",
+                        ]);
+                    if (tiles.length || B) {
+                        const badges = B
+                            ? B.list
+                                  .slice(-12)
+                                  .map(
+                                      (b) =>
+                                          `<div class="badge" data-tip="${esc(b.name)}${b.date ? " · " + fmtDate(b.date) : ""}">${
+                                              b.icon
+                                                  ? `<img src="${esc(b.icon)}" alt="${esc(b.name)}" referrerpolicy="no-referrer" onerror="this.replaceWith(document.createTextNode('${esc(b.name.slice(0, 1).toUpperCase())}'))">`
+                                                  : esc(
+                                                        b.name
+                                                            .slice(0, 1)
+                                                            .toUpperCase(),
+                                                    )
+                                          }</div>`,
+                                  )
+                                  .join("")
+                            : "";
+                        add(
+                            "lemon",
+                            "Loot",
+                            `
+        <p ${r(0, "kicker")}>The loot</p>
+        <h2 ${r(1, "big")}>${B ? `<span class="accent">${plural(B.count, "badge")}</span>` : "Your stash"}</h2>
+        ${B ? `<div ${r(2, "badges")} data-noadvance>${badges}</div>` : ""}
+        <div ${r(3, "tiles")}>${tiles.map(([k, v]) => `<div class="tile"><p class="kicker">${esc(k)}</p><p class="mid">${esc(v)}</p></div>`).join("")}</div>
+        ${co ? `<p ${r(4, "note")}>Coalition rank shown next to ${esc(co.name)}.</p>` : ""}`,
+                        );
+                    }
+                }
 
-  {
-    const cells = [['Projects passed', pr.done]];
-    if (G) cells.push(['Average grade', G.average + '%']);
-    if (T) cells.push(['Busiest month', shortMonth(T.peakMonth.month)]);
-    if (Q) cells.push(['Ride-or-die', Q.mates[0].login]);
-    if (SK && SK.top.length) cells.push(['Top skill', SK.top[0].name]);
-    if (M) cells.push(['Map explored', M.percent + '%']);
-    else if (F) cells.push(['Peers say', F.title]);
-    if (C && cells.length < 6) cells.push(['Peak hour', hh(C.peakHour)]);
-    if (L && cells.length < 6) cells.push(['Typical week', L.typical + 'h']);
-    add('plum', 'Summary', `
-      <div ${r(0, 'card')}>
+                {
+                    const cells = [["Projects passed", pr.done]];
+                    if (G) cells.push(["Average grade", G.average + "%"]);
+                    if (T)
+                        cells.push([
+                            "Busiest month",
+                            shortMonth(T.peakMonth.month),
+                        ]);
+                    if (Q) cells.push(["Ride-or-die", Q.mates[0].login]);
+                    if (SK && SK.top.length)
+                        cells.push(["Top skill", SK.top[0].name]);
+                    if (M) {
+                        const far = M.branches.reduce((a, b) =>
+                            b.done > a.done ? b : a,
+                        );
+                        cells.push([
+                            "Furthest branch",
+                            `${far.label} ${far.done}/${far.total}`,
+                        ]);
+                    } else if (F) cells.push(["Peers say", F.title]);
+                    if (C && cells.length < 6)
+                        cells.push(["Peak hour", hh(C.peakHour)]);
+                    if (L && cells.length < 6)
+                        cells.push(["Typical week", L.typical + "h"]);
+                    add(
+                        "plum",
+                        "Summary",
+                        `
+      <div ${r(0, "card")}>
         <p class="kicker">School 21 Wrapped · ${esc(S.login)}</p>
         <div><p class="kicker" style="margin-bottom:6px">You are a</p><h2 class="big">${esc(S.persona)}</h2></div>
-        <div class="card-grid">${cells.slice(0, 6).map(([k, v]) => `<div><span>${esc(k)}</span><b title="${esc(v)}">${esc(v)}</b></div>`).join('')}</div>
-        <div class="card-foot"><span>${esc([P.campus && P.campus.shortName, P.className].filter(Boolean).join(' · '))}</span><span>${S.fetchedAt ? fmtDate(S.fetchedAt) : ''}</span></div>
+        <div class="card-grid">${cells
+            .slice(0, 6)
+            .map(
+                ([k, v]) =>
+                    `<div><span>${esc(k)}</span><b title="${esc(v)}">${esc(v)}</b></div>`,
+            )
+            .join("")}</div>
+        <div class="card-foot"><span>${esc([P.campus && P.campus.shortName, P.className].filter(Boolean).join(" · "))}</span><span>${S.fetchedAt ? fmtDate(S.fetchedAt) : ""}</span></div>
       </div>
-      <p ${r(1, 'hint')}>Screenshot this and flex on your cluster.</p>`);
-  }
+      <p ${r(1, "hint")}>Screenshot this and flex on your cluster.</p>`,
+                    );
+                }
 
-  // ---------- stage ----------
-  const stage = document.getElementById('stage');
-  const host = document.getElementById('slides');
-  const bars = document.getElementById('bars');
-  const tip = document.getElementById('tip');
-  const els = slides.map((s, i) => {
-    const el = document.createElement('section');
-    const [bg, fg, accent] = THEMES[s.theme];
-    el.className = 'slide';
-    el.style.cssText = `--bg:${bg};--fg:${fg};--accent:${accent}`;
-    el.setAttribute('role', 'group');
-    el.setAttribute('aria-roledescription', 'slide');
-    el.setAttribute('aria-label', `${i + 1} of ${slides.length}: ${s.label}`);
-    el.innerHTML = `<div class="inner">${s.html}</div>`;
-    host.appendChild(el);
-    if (s.mount) s.mount(el);
-    const b = document.createElement('button');
-    b.setAttribute('aria-label', `Go to slide ${i + 1}: ${s.label}`);
-    b.addEventListener('click', e => { e.stopPropagation(); show(i); });
-    bars.appendChild(b);
-    return el;
-  });
+                // ---------- stage ----------
+                const stage = document.getElementById("stage");
+                const host = document.getElementById("slides");
+                const bars = document.getElementById("bars");
+                const tip = document.getElementById("tip");
+                const els = slides.map((s, i) => {
+                    const el = document.createElement("section");
+                    const [bg, fg, accent] = THEMES[s.theme];
+                    el.className = "slide";
+                    el.style.cssText = `--bg:${bg};--fg:${fg};--accent:${accent}`;
+                    el.setAttribute("role", "group");
+                    el.setAttribute("aria-roledescription", "slide");
+                    el.setAttribute(
+                        "aria-label",
+                        `${i + 1} of ${slides.length}: ${s.label}`,
+                    );
+                    el.innerHTML = `<div class="inner">${s.html}</div>`;
+                    host.appendChild(el);
+                    if (s.mount) s.mount(el);
+                    const b = document.createElement("button");
+                    b.setAttribute(
+                        "aria-label",
+                        `Go to slide ${i + 1}: ${s.label}`,
+                    );
+                    b.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        show(i);
+                    });
+                    bars.appendChild(b);
+                    return el;
+                });
 
-  function countUp(el) {
-    el.querySelectorAll('[data-count]').forEach(node => {
-      const target = Number(node.dataset.count);
-      if (reduced || !target) { node.textContent = target; return; }
-      const start = performance.now(), dur = 1100;
-      const tick = now => {
-        const t = Math.min(1, (now - start) / dur);
-        node.textContent = Math.round(target * (1 - Math.pow(1 - t, 3)));
-        if (t < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-    });
-  }
+                function countUp(el) {
+                    el.querySelectorAll("[data-count]").forEach((node) => {
+                        const target = Number(node.dataset.count);
+                        if (reduced || !target) {
+                            node.textContent = target;
+                            return;
+                        }
+                        const start = performance.now(),
+                            dur = 1100;
+                        const tick = (now) => {
+                            const t = Math.min(1, (now - start) / dur);
+                            node.textContent = Math.round(
+                                target * (1 - Math.pow(1 - t, 3)),
+                            );
+                            if (t < 1) requestAnimationFrame(tick);
+                        };
+                        requestAnimationFrame(tick);
+                    });
+                }
 
-  let cur = -1;
-  function show(i) {
-    i = Math.max(0, Math.min(slides.length - 1, i));
-    if (i === cur) return;
-    cur = i;
-    hideTip();
-    els.forEach((el, j) => el.classList.toggle('on', j === i));
-    [...bars.children].forEach((b, j) => { b.className = j < i ? 'past' : j === i ? 'now' : ''; });
-    stage.style.cssText = els[i].style.cssText;
-    document.body.style.cssText = els[i].style.cssText;
-    els[i].scrollTop = 0;
-    countUp(els[i]);
-    try { history.replaceState(null, '', '#' + (i + 1)); } catch (e) { /* file:// in some browsers */ }
-  }
+                let cur = -1;
+                function show(i) {
+                    i = Math.max(0, Math.min(slides.length - 1, i));
+                    if (i === cur) return;
+                    cur = i;
+                    hideTip();
+                    els.forEach((el, j) => el.classList.toggle("on", j === i));
+                    [...bars.children].forEach((b, j) => {
+                        b.className = j < i ? "past" : j === i ? "now" : "";
+                    });
+                    stage.style.cssText = els[i].style.cssText;
+                    document.body.style.cssText = els[i].style.cssText;
+                    els[i].scrollTop = 0;
+                    countUp(els[i]);
+                    try {
+                        history.replaceState(null, "", "#" + (i + 1));
+                    } catch (e) {
+                        /* file:// in some browsers */
+                    }
+                }
 
-  stage.addEventListener('click', e => {
-    if (e.target.closest('[data-noadvance], button, a')) return;
-    show(e.clientX < innerWidth * 0.3 ? cur - 1 : cur + 1);
-  });
-  document.getElementById('prev').addEventListener('click', e => { e.stopPropagation(); show(cur - 1); });
-  document.getElementById('next').addEventListener('click', e => { e.stopPropagation(); show(cur + 1); });
-  addEventListener('keydown', e => {
-    if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); show(cur + 1); }
-    if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); show(cur - 1); }
-    if (e.key === 'Home') show(0);
-    if (e.key === 'End') show(slides.length - 1);
-  });
+                stage.addEventListener("click", (e) => {
+                    if (e.target.closest("[data-noadvance], button, a")) return;
+                    show(e.clientX < innerWidth * 0.3 ? cur - 1 : cur + 1);
+                });
+                document
+                    .getElementById("prev")
+                    .addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        show(cur - 1);
+                    });
+                document
+                    .getElementById("next")
+                    .addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        show(cur + 1);
+                    });
+                addEventListener("keydown", (e) => {
+                    if (["ArrowRight", " ", "PageDown"].includes(e.key)) {
+                        e.preventDefault();
+                        show(cur + 1);
+                    }
+                    if (["ArrowLeft", "PageUp"].includes(e.key)) {
+                        e.preventDefault();
+                        show(cur - 1);
+                    }
+                    if (e.key === "Home") show(0);
+                    if (e.key === "End") show(slides.length - 1);
+                });
 
-  function showTip(text, x, y) {
-    tip.textContent = text;
-    const half = tip.offsetWidth / 2 + 8;
-    tip.style.left = Math.max(half, Math.min(innerWidth - half, x)) + 'px';
-    tip.style.top = Math.max(48, y) + 'px';
-    tip.classList.add('show');
-  }
-  function hideTip() { tip.classList.remove('show'); }
-  document.addEventListener('pointermove', e => {
-    if (e.target.closest('.line-chart')) return;
-    const t = e.target.closest('[data-tip]');
-    if (t) showTip(t.dataset.tip, e.clientX, e.clientY); else hideTip();
-  });
-  document.addEventListener('pointerdown', e => {
-    const t = e.target.closest('[data-tip]');
-    if (t) showTip(t.dataset.tip, e.clientX, e.clientY);
-  });
+                function showTip(text, x, y) {
+                    tip.textContent = text;
+                    const half = tip.offsetWidth / 2 + 8;
+                    tip.style.left =
+                        Math.max(half, Math.min(innerWidth - half, x)) + "px";
+                    tip.style.top = Math.max(48, y) + "px";
+                    tip.classList.add("show");
+                }
+                function hideTip() {
+                    tip.classList.remove("show");
+                }
+                document.addEventListener("pointermove", (e) => {
+                    if (e.target.closest(".line-chart")) return;
+                    const t = e.target.closest("[data-tip]");
+                    if (t) showTip(t.dataset.tip, e.clientX, e.clientY);
+                    else hideTip();
+                });
+                document.addEventListener("pointerdown", (e) => {
+                    const t = e.target.closest("[data-tip]");
+                    if (t) showTip(t.dataset.tip, e.clientX, e.clientY);
+                });
 
-  show(Math.max(0, (parseInt(location.hash.slice(1), 10) || 1) - 1));
-})();
-</script>
-</body>
+                show(
+                    Math.max(
+                        0,
+                        (parseInt(location.hash.slice(1), 10) || 1) - 1,
+                    ),
+                );
+            })();
+        </script>
+    </body>
 </html>
