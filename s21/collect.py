@@ -44,7 +44,7 @@ def _logtime_weeks(client, login, weeks, today, previous):
     return history
 
 
-def collect(client, login, own_login, weeks=52, previous=None):
+def collect(client, login, weeks=52, previous=None):
     base = f"/participants/{login}"
     raw = {"login": login, "fetchedAt": dt.datetime.now().isoformat()}
     print(f"fetching {login}", file=sys.stderr)
@@ -62,11 +62,9 @@ def collect(client, login, own_login, weeks=52, previous=None):
         f"{base}/feedback"))
     raw["coalition"] = _optional("coalition", lambda: client.get(
         f"{base}/coalition"))
-    # /graph is the map of whoever owns the token, so it only means
-    # something when you are wrapping yourself.
-    raw["graph"] = None
-    if login == own_login:
-        raw["graph"] = _optional("graph", lambda: client.get("/graph"))
+    # /graph is the map of whoever owns the token. For a peer it is still
+    # a good layout: their own projects decide which cells light up.
+    raw["graph"] = _optional("graph", lambda: client.get("/graph"))
     raw["logtime"] = _optional("logtime", lambda: _logtime_weeks(
         client, login, weeks, dt.date.today(), previous))
     return raw

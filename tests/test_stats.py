@@ -12,6 +12,11 @@ def project(pid, status="ACCEPTED", when=None, score=100, team=None, course=None
             "teamMembers": team, "courseId": course}
 
 
+def node(label, keys):
+    return {"label": label, "items": [
+        {"entityType": kind, "entityId": i, "code": f"N{i}"} for kind, i in keys]}
+
+
 class StatsTest(unittest.TestCase):
     def test_demo_builds_every_section(self):
         story = stats.build(demo.raw_demo(), UTC)
@@ -67,26 +72,35 @@ class StatsTest(unittest.TestCase):
                                           {"login": "b", "count": 1}])
         self.assertEqual(squad["teamlead"], 1)
 
-    def test_map_counts_cleared_branches(self):
+    def test_map_opens_courses_and_hides_untouched_branches(self):
         graph = {"nodes": [
-            {"label": "A", "items": [{"entityType": "PROJECT", "entityId": 1}]},
-            {"label": "B", "items": [{"entityType": "PROJECT", "entityId": 2},
-                                     {"entityType": "COURSE", "entityId": 9}]}]}
-        explored = stats.map_explored(graph, [project(1), project(2)], [])
-        self.assertEqual(explored["branchesCleared"], ["A"])
-        self.assertEqual(explored["percent"], 67)
+            node("SQL - I", [("COURSE", 1), ("PROJECT", 9)]),
+            node("Go", [("PROJECT", 50)])]}
+        rows = [project(2, course=1), project(10, course=1),
+                project(3, status="IN_PROGRESS", course=1)]
+        explored = stats.map_explored(graph, rows, [])
+        [sql] = explored["branches"]
+        self.assertEqual([c["title"] for c in sql["cells"]], ["P2", "P10", "P3", "N9"])
+        self.assertEqual([c["state"] for c in sql["cells"]],
+                         ["done", "done", "active", "todo"])
+        self.assertEqual((explored["done"], explored["active"]), (2, 1))
 
-    def test_map_merges_track_copies_and_subsets(self):
-        def node(label, ids):
-            return {"label": label, "items": [
-                {"entityType": "PROJECT", "entityId": i} for i in ids]}
-        graph = {"nodes": [node("SQL (PM)", [1, 2]), node("SQL (QA)", [1, 2]),
-                           node("SQL - I", [1, 2]), node("DevOps (CPP)", [3, 4, 5]),
-                           node("DevOps-II", [3, 4]), node("Java Bootcamp (QA)", [6])]}
-        explored = stats.map_explored(graph, [project(1)], [])
-        self.assertEqual(sorted(b["label"] for b in explored["branches"]),
-                         ["DevOps", "Java Bootcamp", "SQL - I"])
-        self.assertEqual(explored["itemsTotal"], 6)
+    def test_map_merges_overlapping_tracks(self):
+        graph = {"nodes": [
+            node("DevOps-I", [("PROJECT", 1), ("PROJECT", 2), ("PROJECT", 3)]),
+            node("DO - I", [("PROJECT", 1), ("PROJECT", 2), ("PROJECT", 4), ("PROJECT", 5)]),
+            node("SQL (QA)", [("PROJECT", 7)]), node("SQL - I", [("PROJECT", 7)])]}
+        explored = stats.map_explored(graph, [project(1), project(7)], [])
+        totals = {b["label"]: b["total"] for b in explored["branches"]}
+        self.assertEqual(totals, {"DO - I": 5, "SQL - I": 1})
+        self.assertEqual(explored["branchesCleared"], ["SQL - I"])
+
+    def test_map_collapses_renamed_copies(self):
+        rows = [dict(project(1), title="CT1_Self-determination"),
+                dict(project(2, status="ASSIGNED"), title="CT1_Self_determination")]
+        graph = {"nodes": [node("Career", [("PROJECT", 1), ("PROJECT", 2)])]}
+        [career] = stats.map_explored(graph, rows, [])["branches"]
+        self.assertEqual((career["done"], career["total"]), (1, 1))
 
     def test_logtime_trims_weeks_before_start(self):
         history = [{"week": f"w{i}", "hours": h} for i, h in enumerate([0, 0, 4, 0, 8])]

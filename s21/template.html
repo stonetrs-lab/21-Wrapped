@@ -93,12 +93,17 @@
   .dcol span { font-size: 12px; font-weight: 700; color: color-mix(in srgb, var(--fg) 70%, var(--bg)); }
 
   .grid { display: grid; gap: 7px; }
-  .branch { display: grid; grid-template-columns: minmax(80px, 30%) 1fr; gap: 12px; align-items: center; }
-  .branch b { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .branch { display: grid; grid-template-columns: minmax(110px, 40%) 1fr; gap: 12px; align-items: center; }
+  .branch b { font-size: 13px; display: flex; gap: 6px; min-width: 0; }
+  .branch b span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .branch b small { flex: none; }
   .cells { display: flex; flex-wrap: wrap; gap: 3px; }
   .cells i { width: 16px; height: 16px; border-radius: 3px;
     border: 2px solid color-mix(in srgb, var(--fg) 28%, transparent); }
+  .cells i { cursor: default; }
   .cells i.on { background: var(--accent); border-color: var(--accent); }
+  .cells i.wip { border-color: var(--accent); }
+  .branch b small { font-weight: 600; color: color-mix(in srgb, var(--fg) 62%, var(--bg)); }
   .branch.clear b { color: var(--accent); }
 
   .people { display: grid; gap: 10px 20px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
@@ -429,19 +434,23 @@
       ${K.list.length > rows.length ? `<p class="note">+${K.list.length - rows.length} more</p>` : ''}`);
   }
 
-  if (M && M.itemsTotal) {
+  if (M) {
     const shown = M.branches.slice(0, 12);
+    const state = { done: 'passed', active: 'in progress', todo: 'not yet' };
+    const cleared = M.branchesCleared.length
+      ? `Fully cleared: <b>${M.branchesCleared.slice(0, 4).map(esc).join(', ')}</b>${M.branchesCleared.length > 4 ? ' and more' : ''}.`
+      : 'No branch fully cleared yet. Getting there.';
     let d = 0;
     add('plum', 'Map', `
       <p ${r(0, 'kicker')}>The project map</p>
-      <div ${r(1, 'huge accent')}><span data-count="${M.percent}">${M.percent}</span><span class="unit">%</span></div>
-      <p ${r(2, 'lede')}>of the map explored${M.percent < 10 ? ". It covers every track, so there's plenty of fog left" : ''}. ${M.itemsDone} of ${M.itemsTotal} nodes lit up${M.branchesCleared.length ? `, and you fully cleared <b>${M.branchesCleared.slice(0, 4).map(esc).join(', ')}</b>${M.branchesCleared.length > 4 ? ' and more' : ''}` : ''}.</p>
+      <div ${r(1, 'huge accent')} data-count="${M.done}">${M.done}</div>
+      <p ${r(2, 'lede')}>projects lit up across ${plural(M.branches.length, 'branch', 'branches')}. ${cleared}${M.active ? ` ${M.active} more in progress.` : ''}</p>
       <div ${r(3, 'grid')} data-noadvance>${shown.map(b => `
-        <div class="branch${b.done === b.total ? ' clear' : ''}" data-tip="${esc(b.label)}: ${b.done}/${b.total}">
-          <b>${esc(b.label)}</b>
-          <div class="cells">${Array.from({ length: b.total }, (_, i) => `<i class="${i < b.done ? 'on' : ''}" style="--d:${(d++) * 18}ms"></i>`).join('')}</div>
+        <div class="branch${b.done === b.total ? ' clear' : ''}">
+          <b title="${esc(b.label)}"><span>${esc(b.label)}</span><small>${b.done}/${b.total}</small></b>
+          <div class="cells">${b.cells.map(c => `<i class="${c.state === 'done' ? 'on' : c.state === 'active' ? 'wip' : ''}" style="--d:${(d++) * 18}ms" data-tip="${esc(c.title)} · ${state[c.state]}"></i>`).join('')}</div>
         </div>`).join('')}</div>
-      ${M.branches.length > shown.length ? `<p class="note">+${M.branches.length - shown.length} more branches</p>` : ''}`);
+      <p ${r(4, 'note')}>${M.branches.length > shown.length ? `+${M.branches.length - shown.length} more branches · ` : ''}Courses are opened up into their projects. Filled = passed, outlined = in progress. Hover a block for its name.</p>`);
   }
 
   if (L) {
@@ -500,7 +509,10 @@
     if (T) cells.push(['Busiest month', shortMonth(T.peakMonth.month)]);
     if (Q) cells.push(['Ride-or-die', Q.mates[0].login]);
     if (SK && SK.top.length) cells.push(['Top skill', SK.top[0].name]);
-    if (M) cells.push(['Map explored', M.percent + '%']);
+    if (M) {
+      const far = M.branches.reduce((a, b) => (b.done > a.done ? b : a));
+      cells.push(['Furthest branch', `${far.label} ${far.done}/${far.total}`]);
+    }
     else if (F) cells.push(['Peers say', F.title]);
     if (C && cells.length < 6) cells.push(['Peak hour', hh(C.peakHour)]);
     if (L && cells.length < 6) cells.push(['Typical week', L.typical + 'h']);

@@ -45,7 +45,7 @@ to go back, or use the progress bar at the top. Hover or tap charts for exact va
 | Night owl or early bird | hour of each completion, local time (skipped if the API only stores dates) |
 | Ride-or-die and every other teammate | `teamMembers` on group projects |
 | Course clusters | `/courses`, with projects grouped by their `courseId` |
-| Project map explored, with fully cleared branches | `/graph` nodes; branches repeated per track (e.g. `SQL (PM)`, `SQL (QA)`) are merged by project id |
+| Project map: passed projects per branch, also for peers | `/graph` nodes. Course nodes are opened up into their projects, branches sharing a project (`SQL (PM)`/`SQL - I`, `DO - I`/`DevOps-I`) are merged, renamed copies are collapsed. A peer's cache without a graph borrows yours as the layout |
 | Time on campus | `/logtime?date=`, sampled once per week (`--weeks`, default 52) |
 | Peers' verdict | `/feedback` |
 | Top skills, badges, coins, review points, coalition rank | `/skills`, `/badges`, `/points`, `/coalition` |

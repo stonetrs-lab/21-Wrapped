@@ -2,6 +2,7 @@
 
 import collections
 import datetime as dt
+import re
 import statistics
 
 DONE = "ACCEPTED"
@@ -194,43 +195,109 @@ def _clean_label(label):
     return label
 
 
-def _unique_branches(nodes):
-    """The graph repeats the same projects under every track, e.g.
-    'SQL (PM)', 'SQL (QA)', 'SQL - I' share ids. Keep one branch per set
-    of ids and drop branches fully contained in a bigger one."""
-    branches = []
-    for node in nodes:
-        keys = frozenset((i["entityType"], i["entityId"]) for i in node["items"])
-        if keys:
-            branches.append((node["label"], keys))
-    # Bigger sets first; among equal sets prefer a label without "(track)".
-    branches.sort(key=lambda b: (-len(b[1]), "(" in b[0]))
-    kept = []
+def _natural(text):
+    """Sort key so SQLB2 comes before SQLB10."""
+    return [int(part) if part.isdigit() else part
+            for part in re.split(r"(\d+)", text)]
+
+
+def _cell_keys(item, by_course):
+    """A COURSE item is a cluster of projects. Open it up into those
+    projects, so a passed SQL bootcamp shows its 12 days, not one cell."""
+    inside = by_course.get(item["entityId"]) if item["entityType"] == "COURSE" else None
+    if inside:
+        return [("PROJECT", p["id"])
+                for p in sorted(inside, key=lambda p: _natural(p["title"]))]
+    return [(item["entityType"], item["entityId"])]
+
+
+def _merge_overlapping(branches):
+    """The graph repeats tracks: 'SQL (PM)' and 'SQL - I' are copies,
+    'DO - I' and 'DevOps-I' share DO1/DO2. Any branches sharing a project
+    are one branch, labelled after the biggest of them."""
+    groups = []
     for label, keys in branches:
-        if not any(keys <= other for _, other in kept):
-            kept.append((_clean_label(label), keys))
-    return kept
+        touching = [g for g in groups if set(keys) & g["set"]]
+        merged = {"parts": [(label, keys)], "set": set(keys)}
+        for group in touching:
+            groups.remove(group)
+            merged["parts"] += group["parts"]
+            merged["set"] |= group["set"]
+        groups.append(merged)
+    result = []
+    for group in groups:
+        parts = sorted(group["parts"], key=lambda p: (-len(p[1]), "(" in p[0]))
+        ordered = list(dict.fromkeys(k for _, keys in parts for k in keys))
+        result.append((_clean_label(parts[0][0]), ordered))
+    return result
+
+
+def _map_branches(graph, projects):
+    by_course = collections.defaultdict(list)
+    for project in projects:
+        if project.get("courseId") is not None:
+            by_course[project["courseId"]].append(project)
+    branches = []
+    for node in graph["nodes"]:
+        keys = [k for item in node["items"] for k in _cell_keys(item, by_course)]
+        if keys:
+            branches.append((node["label"], list(dict.fromkeys(keys))))
+    return _merge_overlapping(branches)
+
+
+MAP_ACTIVE = {"IN_PROGRESS", "IN_REVIEWS"}  # REGISTERED is often automatic
+RANK = {"done": 0, "active": 1, "todo": 2}
+
+
+def _cell_states(graph, projects, course_list):
+    """(type, id) -> (title, 'done' | 'active' | 'todo')."""
+    names = {(i["entityType"], i["entityId"]): i["code"]
+             for node in graph["nodes"] for i in node["items"]}
+    rows = [("PROJECT", p) for p in projects]
+    rows += [("COURSE", c) for c in course_list or []]
+    states = {}
+    for kind, row in rows:
+        state = "done" if row["status"] == DONE else (
+            "active" if row["status"] in MAP_ACTIVE else "todo")
+        states[(kind, row["id"])] = (row["title"], state)
+    return lambda key: states.get(key, (names.get(key, "?"), "todo"))
+
+
+def _collapse_versions(cells):
+    """Tracks carry renamed copies ('CT1_Self_determination' next to
+    'CT1_Self-determination'). One cell per name, best state wins."""
+    best = {}
+    for cell in cells:
+        name = re.sub(r"[^a-z0-9]", "", cell["title"].lower())
+        if name not in best or RANK[cell["state"]] < RANK[best[name]["state"]]:
+            best[name] = cell
+    return list(best.values())
 
 
 def map_explored(graph, projects, course_list):
+    """Branches with at least one passed project, one cell per project."""
     if not graph or not graph.get("nodes"):
         return None
-    done = {("PROJECT", p["id"]) for p in _done(projects)}
-    done |= {("COURSE", c["id"]) for c in course_list or []
-             if c["status"] == DONE}
-    kept = _unique_branches(graph["nodes"])
-    every = frozenset().union(*(keys for _, keys in kept)) if kept else set()
-    branches = [{"label": label, "done": len(keys & done), "total": len(keys)}
-                for label, keys in kept]
-    cleared = len(every & done)
+    state_of = _cell_states(graph, projects, course_list)
+    started = []
+    every = {}
+    for label, keys in _map_branches(graph, projects):
+        cells = [dict(zip(("title", "state"), state_of(k))) for k in keys]
+        every.update(zip(keys, (c["state"] for c in cells)))
+        cells = sorted(_collapse_versions(cells), key=lambda c: RANK[c["state"]])
+        done = sum(c["state"] == "done" for c in cells)
+        active = sum(c["state"] == "active" for c in cells)
+        if done:
+            started.append({"label": label, "done": done, "active": active,
+                            "total": len(cells), "cells": cells})
+    if not started:
+        return None
+    started.sort(key=lambda b: (-b["done"] / b["total"], -b["done"]))
     return {
-        "itemsDone": cleared,
-        "itemsTotal": len(every),
-        "percent": round(100 * cleared / len(every)) if every else 0,
-        "branchesCleared": [b["label"] for b in branches
-                            if b["done"] == b["total"]],
-        "branches": sorted(branches,
-                           key=lambda b: (-b["done"] / b["total"], -b["done"])),
+        "done": sum(s == "done" for s in every.values()),
+        "active": sum(s == "active" for s in every.values()),
+        "branchesCleared": [b["label"] for b in started if b["done"] == b["total"]],
+        "branches": started,
     }
 
 

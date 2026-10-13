@@ -93,16 +93,29 @@ def fetch(args):
     token = cached_token(own)
     try:
         client = api.Client(token or new_token(own, saved))
-        raw = collect.collect(client, login, own, args.weeks, previous)
+        raw = collect.collect(client, login, args.weeks, previous)
     except api.ApiError as err:
         if err.status != 401 or not token:
             raise
         print("saved token was rejected, logging in again", file=sys.stderr)
         client = api.Client(new_token(own, saved))
-        raw = collect.collect(client, login, own, args.weeks, previous)
+        raw = collect.collect(client, login, args.weeks, previous)
     previous_path.parent.mkdir(exist_ok=True)
     previous_path.write_text(json.dumps(raw, ensure_ascii=False, indent=1))
     print(f"raw data cached in {previous_path}", file=sys.stderr)
+    return raw
+
+
+def borrow_graph(raw):
+    """Peer caches from before the map worked for peers have no graph.
+    Any cached graph will do, since it is only the layout."""
+    if raw.get("graph"):
+        return raw
+    for path in sorted(CACHE.glob("*.json")):
+        if path.name != TOKEN.name:
+            graph = json.loads(path.read_text()).get("graph")
+            if graph:
+                return {**raw, "graph": graph}
     return raw
 
 
@@ -125,7 +138,7 @@ def main():
         sys.exit(f"error: {err}")
     except FileNotFoundError as err:
         sys.exit(f"error: no cached data ({err.filename}), run once without --offline")
-    story = stats.build(raw)
+    story = stats.build(borrow_graph(raw))
     out = Path(args.out) if args.out else HERE / "out" / f"{raw['login']}-wrapped.html"
     path = render.render(story, out)
     print(f"wrapped: {path}")
